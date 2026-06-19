@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="images/favicon.ico" type="image/svg+xml">
+    <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -24,8 +24,9 @@
                     <li><a href="#services">Services</a></li>
                     <li><a href="#process">Process</a></li>
                     <li><a href="#faq">FAQ</a></li>
+                    <li><button class="nav-about-trigger" type="button">About</button></li>
                 </ul>
-                <button class="btn btn-primary navbar-cta" data-scroll="assessment">Start Assessment</button>
+                <button class="btn btn-primary navbar-cta" data-scroll="assessment" data-analytics="assessment-start">Start Assessment</button>
                 <div class="navbar-toggle">
                     <span></span>
                     <span></span>
@@ -35,6 +36,29 @@
         </div>
     </nav>
 
+    <!-- About Modal (shows on first load) -->
+    <div class="about-modal" id="aboutModal" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle">
+        <div class="about-panel">
+            <button class="about-close" type="button" aria-label="Close About">×</button>
+            <div class="about-content">
+                <h2 id="aboutTitle">About NotablePath</h2>
+                <p>NotablePath is an independent consultation service focusing on Wikipedia research, source analysis and editorial guidance.</p>
+                <p>We are not affiliated with the Wikimedia Foundation and do not promise guaranteed approvals. Our goal is to help you make informed, professional choices.</p>
+                <div class="about-highlight">
+                    <h3>Founder & Wikipedia Research Consultant</h3>
+                    <p>The founder provides expert guidance on source strength, article structure and Wikipedia readiness without claiming any official editorial influence.</p>
+                </div>
+                <div class="about-links">
+                    <a href="https://t.me/NotablePathBot" target="_blank" rel="noreferrer" class="btn btn-primary" data-analytics="open-telegram">Start Consultation</a>
+                    <button class="btn btn-secondary" data-scroll="service-details" data-analytics="view-services">Explore Services</button>
+                </div>
+                <p class="about-note">NotablePath is built for professionals seeking a research-first, ethical approach to Wikipedia consultation.</p>
+            </div>
+        </div>
+    </div>
+
+
+
     <!-- Hero Section -->
     <section class="hero">
         <canvas id="particleCanvas"></canvas>
@@ -43,9 +67,10 @@
             <div class="hero-text">
                 <h1 class="hero-title">Wikipedia is not a marketing platform.</h1>
                 <p class="hero-subtitle">Professional consulting, source analysis, article improvement, and article development guidance based on Wikipedia standards.</p>
+                <p class="hero-tagline">NotablePath is an independent consultancy for founders, authors, companies, artists, organizations and public figures.</p>
                 <div class="hero-buttons">
-                    <button class="btn btn-primary magnetic-btn" data-scroll="assessment">Start Assessment</button>
-                    <button class="btn btn-secondary" data-scroll="services">View Services</button>
+                    <button class="btn btn-primary magnetic-btn" data-scroll="assessment" data-analytics="assessment-start">Start Assessment</button>
+                    <button class="btn btn-secondary" data-scroll="services" data-analytics="view-services">View Services</button>
                 </div>
             </div>
             <div class="hero-visualization">
@@ -68,6 +93,30 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M12 5V19M12 19L19 12M12 19L5 12" stroke="#00D4FF" stroke-width="2" stroke-linecap="round"/>
             </svg>
+        </div>
+    </section>
+
+    <!-- Wikipedia Explanation Section -->
+    <section class="explanation">
+        <div class="section-container">
+            <h2 class="section-title">How Wikipedia Works & Why Preparation Matters</h2>
+            <div class="explanation-grid">
+                <div class="explanation-card">
+                    <h3>Community-led editing</h3>
+                    <p>Wikipedia content is governed by volunteer editors, not individual contributors. Articles are accepted only when sources and structure meet established encyclopedia standards.</p>
+                </div>
+                <div class="explanation-card">
+                    <h3>Strict standards matter</h3>
+                    <p>Neutrality, verifiability and notability are non-negotiable. Early preparation reduces the risk of editorial removal, page deletion, or rejection.</p>
+                </div>
+                <div class="explanation-card">
+                    <h3>Preparation is the advantage</h3>
+                    <p>Thorough source research, clear article structure, and thoughtful draft development make the difference between a rejected submission and a Wikipedia-ready entry.</p>
+                </div>
+            </div>
+            <div class="explanation-summary">
+                <p>NotablePath helps clients understand the rules, assess readiness, and build the strongest possible article foundation so they can move forward with confidence.</p>
+            </div>
         </div>
     </section>
 
@@ -169,6 +218,9 @@
                     <h3>Wikipedia Training</h3>
                     <p>Educational sessions on Wikipedia policies, editing practices, and community norms.</p>
                 </div>
+            </div>
+            <div class="services-footer">
+                <a href="services.html" class="btn btn-secondary btn-large" data-analytics="open-services-page">Explore Detailed Services</a>
             </div>
         </div>
     </section>
@@ -398,7 +450,7 @@
             <div class="telegram-content">
                 <h2 class="section-title">Start With Our Assessment Assistant</h2>
                 <p class="telegram-description">Answer a few questions, receive initial guidance, and request a consultation directly through Telegram.</p>
-                <a href="https://t.me/your_bot" class="btn btn-primary btn-large" target="_blank">Open Assessment Assistant</a>
+                <a href="https://t.me/NotablePathBot" class="btn btn-primary btn-large" target="_blank">Open Assessment Assistant</a>
                 <p class="telegram-note">Quick questions • Instant feedback • Direct consultation request</p>
             </div>
             <div class="telegram-visual">
@@ -408,6 +460,29 @@
             </div>
         </div>
     </section>
+
+    <!-- About Modal -->
+    <div class="about-modal" id="aboutModal" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle">
+        <div class="about-panel">
+            <button class="about-close" type="button" aria-label="Close About">×</button>
+            <div class="about-content">
+                <h2 id="aboutTitle">About NotablePath</h2>
+                <p>NotablePath is an independent consultation service focusing on Wikipedia research, source analysis and editorial guidance.</p>
+                <p>We are not affiliated with the Wikimedia Foundation and do not promise guaranteed approvals. Our goal is to help you make informed, professional choices.</p>
+                <div class="about-highlight">
+                    <h3>Founder & Wikipedia Research Consultant</h3>
+                    <p>The founder provides expert guidance on source strength, article structure and Wikipedia readiness without claiming any official editorial influence.</p>
+                </div>
+                <div class="about-links">
+                    <a href="https://t.me/NotablePathBot" target="_blank" rel="noreferrer" class="btn btn-primary" data-analytics="open-telegram">Start Consultation</a>
+                    <button class="btn btn-secondary" data-scroll="service-details" data-analytics="view-services">Explore Services</button>
+                </div>
+                <p class="about-note">NotablePath is built for professionals seeking a research-first, ethical approach to Wikipedia consultation.</p>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- FAQ Section -->
     <section class="faq" id="faq">
@@ -509,7 +584,7 @@
                                 <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7"/>
                             </svg>
                         </a>
-                        <a href="https://t.me/your_bot" target="_blank" aria-label="Telegram">
+                        <a href="https://t.me/NotablePathBot" target="_blank" aria-label="Telegram">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.48-1.13 7.26-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.6.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.06-.15-.04-.24-.02-.1.02-1.7 1.07-4.83 3.18-.46.31-.87.46-1.22.45-.4-.01-1.16-.22-1.73-.42-.7-.23-1.25-.35-1.2-.74.03-.39.49-.77 1.35-1.16 5.32-2.32 6.27-2.72 6.97-2.83.31-.05.82-.01 1.18.18.3.16.48.38.52.74z"/>
                             </svg>

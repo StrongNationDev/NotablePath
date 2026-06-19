@@ -204,6 +204,61 @@ function initNavbarScroll() {
     });
 }
 
+function trackEvent(eventName, eventProps = {}) {
+    window.analyticsQueue = window.analyticsQueue || [];
+    window.analyticsQueue.push({ event: eventName, properties: eventProps, timestamp: new Date().toISOString() });
+    if (window.dataLayer) {
+        window.dataLayer.push({ event: eventName, ...eventProps });
+    }
+    console.log('[Analytics]', eventName, eventProps);
+}
+
+function initAboutModal() {
+    const aboutModal = document.getElementById('aboutModal');
+    const aboutTrigger = document.querySelector('.nav-about-trigger');
+    const aboutClose = document.querySelector('.about-close');
+
+    function openModal() {
+        if (!aboutModal) return;
+        aboutModal.classList.add('active');
+        aboutModal.setAttribute('aria-hidden', 'false');
+        trackEvent('AboutModalOpened');
+    }
+
+    function closeModal() {
+        if (!aboutModal) return;
+        aboutModal.classList.remove('active');
+        aboutModal.setAttribute('aria-hidden', 'true');
+        trackEvent('AboutModalClosed');
+    }
+
+    if (aboutTrigger) {
+        aboutTrigger.addEventListener('click', openModal);
+    }
+    if (aboutClose) {
+        aboutClose.addEventListener('click', closeModal);
+    }
+    if (aboutModal) {
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) {
+                closeModal();
+            }
+        });
+    }
+    setTimeout(openModal, 1000);
+}
+
+function initAnalyticsTracking() {
+    document.querySelectorAll('[data-analytics]').forEach(el => {
+        el.addEventListener('click', () => {
+            const eventName = el.getAttribute('data-analytics');
+            if (eventName) {
+                trackEvent(eventName);
+            }
+        });
+    });
+}
+
 /* ============================
    SCROLL REVEAL ANIMATION
    ============================ */
@@ -282,6 +337,7 @@ function submitAssessment() {
     }
     
     const message = `Assessment Submission:\nQ1: ${q1}\nQ2: ${q2}\nQ3: ${q3.join(', ')}`;
+    trackEvent('AssessmentSubmitted', { q1, q2, q3 });
     window.location.href = `https://t.me/your_bot?text=${encodeURIComponent(message)}`;
 }
 
@@ -338,17 +394,30 @@ function initMagneticButtons() {
 function initMobileNavbar() {
     const navbarToggle = document.querySelector('.navbar-toggle');
     const navbarMenu = document.querySelector('.navbar-menu');
-    
-    if (navbarToggle) {
+    const navbarInner = document.querySelector('.navbar-inner');
+
+    if (navbarToggle && navbarMenu) {
         navbarToggle.addEventListener('click', () => {
-            navbarMenu.style.display = navbarMenu.style.display === 'flex' ? 'none' : 'flex';
+            const isOpen = navbarMenu.classList.toggle('mobile-open');
+            navbarToggle.classList.toggle('open', isOpen);
+            navbarMenu.style.display = isOpen ? 'flex' : 'none';
+            if (navbarInner) {
+                navbarInner.classList.toggle('open', isOpen);
+            }
         });
     }
-    
-    document.querySelectorAll('.navbar-menu a').forEach(link => {
+
+    document.querySelectorAll('.navbar-menu a, .nav-about-trigger').forEach(link => {
         link.addEventListener('click', () => {
             if (navbarMenu) {
+                navbarMenu.classList.remove('mobile-open');
                 navbarMenu.style.display = 'none';
+            }
+            if (navbarToggle) {
+                navbarToggle.classList.remove('open');
+            }
+            if (navbarInner) {
+                navbarInner.classList.remove('open');
             }
         });
     });
@@ -436,9 +505,13 @@ function initCardAnimations() {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize particle network
-    new ParticleNetwork('particleCanvas');
+    if (document.getElementById('particleCanvas')) {
+        new ParticleNetwork('particleCanvas');
+    }
     // Initialize connector canvas for source cards
-    new ConnectorCanvas('connectorCanvas', '.visual-overlay .source-card');
+    if (document.getElementById('connectorCanvas')) {
+        new ConnectorCanvas('connectorCanvas', '.visual-overlay .source-card');
+    }
     
     // Initialize all features
     initNavbarScroll();
@@ -447,11 +520,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initFAQ();
     initMagneticButtons();
     initMobileNavbar();
+    initAboutModal();
+    initAnalyticsTracking();
     initTimelineAnimation();
     initScrollIndicator();
     initParallax();
     initCardAnimations();
     
+    const pageName = document.body.dataset.page || (window.location.pathname.includes('services') ? 'services' : 'homepage');
+    trackEvent('PageView', { page: pageName });
+
     // Add scroll-reveal class to timeline items
     document.querySelectorAll('.timeline-item').forEach(item => {
         item.classList.add('scroll-reveal');
