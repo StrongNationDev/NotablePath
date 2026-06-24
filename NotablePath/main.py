@@ -1,8 +1,9 @@
 import os
 import logging
-from datetime import datetime, timezone
 
 from dotenv import load_dotenv
+
+load_dotenv()
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import (
@@ -17,50 +18,37 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 from aiogram.fsm.storage.memory import MemoryStorage
-
-from supabase import create_client
 from email_validator import validate_email, EmailNotValidError
+
+from lead_service import (
+    build_telegram_assessment,
+    create_supabase_client,
+    format_admin_message,
+    openConsultationBooking,
+    parse_website_payload,
+    save_assessment,
+)
 
 
 # ========================
 # CONFIG
 # ========================
 
-load_dotenv()
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_GROUP_ID = int(os.getenv("ADMIN_GROUP_ID", "3845665410"))
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-ADMIN_GROUP_ID = int(
-    os.getenv("ADMIN_GROUP_ID", "3845665410")
-)
-
-
-logging.basicConfig(
-    level=logging.INFO
-)
+logging.basicConfig(level=logging.INFO)
 
 
 # =========================
 # SERVICES
 # =========================
 
-supabase = create_client(
-    SUPABASE_URL,
-    SUPABASE_KEY
-)
+supabase = create_supabase_client()
 
+bot = Bot(token=BOT_TOKEN)
 
-bot = Bot(
-    token=BOT_TOKEN
-)
-
-
-dp = Dispatcher(
-    storage=MemoryStorage()
-)
+dp = Dispatcher(storage=MemoryStorage())
 
 
 # =========================
@@ -71,11 +59,13 @@ class Assessment(StatesGroup):
 
     request_type = State()
 
-    subject = State()
+    profile_type = State()
+
+    coverage = State()
+
+    draft_status = State()
 
     goal = State()
-
-    wiki_status = State()
 
     contact_type = State()
 
@@ -88,170 +78,73 @@ class Assessment(StatesGroup):
 # =========================
 
 def button(text, data):
-
-    return InlineKeyboardButton(
-        text=text,
-        callback_data=data
-    )
+    return InlineKeyboardButton(text=text, callback_data=data)
 
 
 def menu_keyboard():
-
     return InlineKeyboardMarkup(
         inline_keyboard=[
-
-            [
-                button(
-                    "Start Assessment",
-                    "start_assessment"
-                )
-            ],
-
-            [
-                button(
-                    "Learn About NotablePath",
-                    "about"
-                )
-            ],
-
-            [
-                button(
-                    "Contact Consultant",
-                    "contact"
-                )
-            ]
-
+            [button("Start Assessment", "start_assessment")],
+            [button("Learn About NotablePath", "about")],
+            [button("Contact Consultant", "contact")],
         ]
     )
-
 
 
 def request_keyboard():
-
     options = [
-
-        "I want to understand if I qualify for Wikipedia",
-
-        "I need help improving an existing article",
-
-        "I need research/source analysis",
-
-        "I need guidance for a company or organization",
-
-        "I need guidance for a personal profile",
-
-        "I'm not sure yet"
-
+        "I want guidance for a new Wikipedia article",
+        "I have a rejected draft",
+        "I have an existing article",
+        "I need source analysis",
+        "I am not sure",
     ]
-
-
     return InlineKeyboardMarkup(
-        inline_keyboard=[
-
-            [
-                button(
-                    option,
-                    option
-                )
-            ]
-
-            for option in options
-        ]
+        inline_keyboard=[[button(option, option)] for option in options]
     )
 
 
-
-def goal_keyboard():
-
+def profile_keyboard():
     options = [
-
-        "Build knowledge presence",
-
-        "Improve existing information",
-
-        "Understand Wikipedia requirements",
-
-        "Research my options",
-
-        "Other"
-
+        "Founder",
+        "Business",
+        "Author",
+        "Artist",
+        "Organization",
+        "Public Figure",
+        "Other",
     ]
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[button(option, option)] for option in options]
+    )
 
 
+def coverage_keyboard():
+    options = [
+        "Major Coverage",
+        "Some Coverage",
+        "Minimal Coverage",
+        "Not Sure",
+    ]
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[button(option, option)] for option in options]
+    )
+
+
+def draft_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[
-
-            [
-                button(
-                    x,
-                    x
-                )
-            ]
-
-            for x in options
-
+            [button("Yes", "yes")],
+            [button("No", "no")],
         ]
     )
 
 
-
-def wiki_keyboard():
-
+def contact_method_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[
-
-            [
-                button(
-                    "Yes, an existing article",
-                    "existing"
-                )
-            ],
-
-            [
-                button(
-                    "No article yet",
-                    "none"
-                )
-            ],
-
-            [
-                button(
-                    "Not sure",
-                    "unknown"
-                )
-            ]
-
-        ]
-    )
-
-
-
-def contact_keyboard():
-
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
-
-            [
-                button(
-                    "Telegram username",
-                    "telegram"
-                )
-            ],
-
-            [
-                button(
-                    "Email",
-                    "email"
-                )
-            ],
-
-            [
-                button(
-                    "Leave a message",
-                    "message"
-                )
-            ]
-
+            [button("Telegram", "telegram")],
+            [button("Email", "email")],
         ]
     )
 
@@ -262,22 +155,34 @@ def contact_keyboard():
 # =========================
 
 @dp.message(CommandStart())
-async def start(message: Message):
+async def start(message: Message, state: FSMContext):
+    args = ""
+    await state.clear()
+
+    if hasattr(message, "get_args"):
+        try:
+            args = message.get_args() or ""
+        except Exception:
+            args = ""
+
+    if not args and message.text:
+        parts = message.text.split(maxsplit=1)
+        if len(parts) > 1:
+            args = parts[1]
+
+    prefill = parse_website_payload(args)
+    if prefill:
+        await state.update_data(
+            prefill_profile_type=prefill.get("profile_type"),
+            prefill_readiness_category=prefill.get("readiness_category"),
+            prefill_readiness_score=prefill.get("readiness_score"),
+            prefill_source="website",
+        )
 
     await message.answer(
-
-"""Welcome to NotablePath Assessment Assistant.
-
-NotablePath helps individuals and organizations understand Wikipedia requirements through research, source analysis, and professional consultation.
-
-Wikipedia is built on reliable information and editorial standards, not advertising.
-
-Answer a few questions and we will help you understand your next steps.
-
-By continuing, you agree that NotablePath may use your submitted information only to review your request and provide consultation assistance.""",
-
-        reply_markup=menu_keyboard()
-
+        "<b>Welcome to NotablePath Assessment Assistant.</b>\n\nNotablePath helps individuals and organizations understand Wikipedia requirements through research, source analysis, and professional consultation.\n\n<i>Wikipedia is built on reliable information and editorial standards, not advertising.</i>\n\nAnswer a few questions and we will help you understand your next steps.\n\nBy continuing, you agree that NotablePath may use your submitted information only to review your request and provide consultation assistance.",
+        parse_mode="HTML",
+        reply_markup=menu_keyboard(),
     )
 
 
@@ -302,7 +207,7 @@ async def begin(
 
     await callback.message.answer(
 
-        "What type of Wikipedia assistance are you looking for?",
+        "What best describes your situation?",
 
         reply_markup=request_keyboard()
 
@@ -334,17 +239,26 @@ async def request_type(
 
     )
 
+    data = await state.get_data()
+    prefill_profile = data.get("prefill_profile_type")
 
-    await state.set_state(
-        Assessment.subject
-    )
-
-
-    await callback.message.answer(
-
-        "What is the subject/topic?\n\nExamples:\nPerson\nCompany\nOrganization\nBook\nArtist\nOther"
-
-    )
+    if prefill_profile:
+        await state.update_data(profile_type=prefill_profile)
+        await state.set_state(
+            Assessment.coverage
+        )
+        await callback.message.answer(
+            "Do you currently have independent media coverage?",
+            reply_markup=coverage_keyboard()
+        )
+    else:
+        await state.set_state(
+            Assessment.profile_type
+        )
+        await callback.message.answer(
+            "Who is the subject?",
+            reply_markup=profile_keyboard()
+        )
 
 
 
@@ -353,19 +267,103 @@ async def request_type(
 # =========================
 
 
-@dp.message(
-    Assessment.subject
+@dp.callback_query(
+    Assessment.profile_type
 )
-async def subject(
+async def profile_type(
 
-    message:Message,
+    callback: CallbackQuery,
+    state: FSMContext
+
+):
+
+    await state.update_data(
+
+        profile_type=callback.data
+
+    )
+
+
+    await state.set_state(
+
+        Assessment.coverage
+
+    )
+
+
+    await callback.message.answer(
+
+        "Do you currently have independent media coverage?",
+
+        reply_markup=coverage_keyboard()
+
+    )
+
+
+    await callback.answer()
+
+
+
+# =========================
+# QUESTION 3
+# =========================
+
+
+@dp.callback_query(
+    Assessment.coverage
+)
+async def coverage(
+
+    callback:CallbackQuery,
     state:FSMContext
 
 ):
 
     await state.update_data(
 
-        subject=message.text
+        coverage=callback.data
+
+    )
+
+
+    await state.set_state(
+
+        Assessment.draft_status
+
+    )
+
+
+    await callback.message.answer(
+
+        "Have you previously submitted a Wikipedia draft?",
+
+        reply_markup=draft_keyboard()
+
+    )
+
+
+    await callback.answer()
+
+
+
+# =========================
+# QUESTION 4
+# =========================
+
+
+@dp.callback_query(
+    Assessment.draft_status
+)
+async def draft_status(
+
+    callback:CallbackQuery,
+    state:FSMContext
+
+):
+
+    await state.update_data(
+
+        draft_status=callback.data
 
     )
 
@@ -377,91 +375,14 @@ async def subject(
     )
 
 
-    await message.answer(
-
-        "What is your main goal?",
-
-        reply_markup=goal_keyboard()
-
-    )
-
-
-
-# =========================
-# QUESTION 3
-# =========================
-
-
-@dp.callback_query(
-    Assessment.goal
-)
-async def goal(
-
-    callback:CallbackQuery,
-    state:FSMContext
-
-):
-
-    await state.update_data(
-
-        goal=callback.data
-
-    )
-
-
-    await state.set_state(
-
-        Assessment.wiki_status
-
-    )
-
-
     await callback.message.answer(
 
-        "Do you currently have Wikipedia coverage?",
-
-        reply_markup=wiki_keyboard()
+        "What is your main goal?"
 
     )
 
 
-
-# =========================
-# QUESTION 4
-# =========================
-
-
-@dp.callback_query(
-    Assessment.wiki_status
-)
-async def wiki_status(
-
-    callback:CallbackQuery,
-    state:FSMContext
-
-):
-
-    await state.update_data(
-
-        wiki_status=callback.data
-
-    )
-
-
-    await state.set_state(
-
-        Assessment.contact_type
-
-    )
-
-
-    await callback.message.answer(
-
-        "Where can our consultant contact you?",
-
-        reply_markup=contact_keyboard()
-
-    )
+    await callback.answer()
 
 
 
@@ -500,6 +421,45 @@ async def contact_type(
 
     )
 
+    await callback.answer()
+
+
+
+# =========================
+# QUESTION 5
+
+
+@dp.message(
+    Assessment.goal
+)
+async def goal(
+
+    message:Message,
+    state:FSMContext
+
+):
+
+    await state.update_data(
+
+        goal=message.text
+
+    )
+
+
+    await state.set_state(
+
+        Assessment.contact_type
+
+    )
+
+
+    await message.answer(
+
+        "What is your preferred contact method?",
+
+        reply_markup=contact_method_keyboard()
+
+    )
 
 
 # =========================
@@ -543,134 +503,92 @@ async def finish(
     user = message.from_user
 
 
-    record = {
-
-
-        "telegram_id":
-        user.id,
-
-
-        "username":
-        user.username,
-
-
-        "full_name":
-        user.full_name,
-
-
-        "request_type":
-        data["request_type"],
-
-
-        "subject":
-        data["subject"],
-
-
-        "goal":
-        data["goal"],
-
-
-        "wiki_status":
-        data["wiki_status"],
-
-
-        "contact_type":
-        data["contact_type"],
-
-
-        "contact_value":
-        contact,
-
-
-        "created_at":
-        datetime.now(
-            timezone.utc
-        ).isoformat()
-
-    }
-
-
-
-    supabase.table(
-        "assessments"
-    ).insert(
-        record
-    ).execute()
-
-
-
-    admin_message=f"""
-
-New NotablePath Assessment
-
-
-Name:
-{user.full_name}
-
-
-Contact:
-{contact}
-
-
-Request Type:
-{data['request_type']}
-
-
-Subject:
-{data['subject']}
-
-
-Goal:
-{data['goal']}
-
-
-Wikipedia Status:
-{data['wiki_status']}
-
-
-Date:
-{datetime.now().strftime('%Y-%m-%d %H:%M')}
-
-"""
-
-
-    await bot.send_message(
-
-        ADMIN_GROUP_ID,
-
-        admin_message
-
+    username = user.username if user.username else None
+    full_name = getattr(user, "full_name", None) or f"{user.first_name or ''} {user.last_name or ''}".strip() or "Telegram User"
+    record = build_telegram_assessment(
+        telegram_id=user.id,
+        username=username,
+        full_name=full_name,
+        request_type=data["request_type"],
+        subject=data.get("profile_type", "Unknown"),
+        goal=data["goal"],
+        wiki_status=data.get("coverage", "Not Sure"),
+        contact_type=data["contact_type"],
+        contact_value=contact,
+        draft_status=data.get("draft_status", "Unknown"),
+        prefill_source=data.get("prefill_source"),
+        readiness_score=data.get("prefill_readiness_score"),
+        readiness_category=data.get("prefill_readiness_category"),
     )
+
+
+
+    try:
+        result = save_assessment(supabase, record)
+    except Exception as e:
+        logging.exception("Supabase insert failed")
+        await message.answer(
+            "There was an issue saving your assessment. Please try again later."
+        )
+        try:
+            await bot.send_message(
+                ADMIN_GROUP_ID,
+                f"⚠️ <b>Failed to save assessment</b> for <i>{full_name}</i>:\n<pre>{e}</pre>",
+                parse_mode="HTML",
+            )
+        except Exception:
+            logging.exception("Failed to notify admin about save failure")
+        return
+
+    if getattr(result, "error", None):
+        logging.error("Failed to save Telegram assessment: %s", result.error)
+        await message.answer(
+            "There was an issue saving your assessment. Please try again later."
+        )
+        try:
+            await bot.send_message(
+                ADMIN_GROUP_ID,
+                f"⚠️ <b>Supabase error</b>: <pre>{result.error}</pre>",
+                parse_mode="HTML",
+            )
+        except Exception:
+            logging.exception("Failed to notify admin about supabase error")
+        return
+
+    admin_message = format_admin_message(record)
+    try:
+        await bot.send_message(ADMIN_GROUP_ID, admin_message, parse_mode="HTML")
+    except Exception as e:
+        logging.exception("Failed to send admin message: %s", e)
+        owner = os.getenv("BOT_OWNER")
+        if owner:
+            try:
+                await bot.send_message(owner, f"Failed to deliver admin alert: {e}\n\nLead:\n{admin_message}", parse_mode="HTML")
+            except Exception:
+                logging.exception("Fallback admin notify failed")
 
 
 
     await message.answer(
-
-"""Thank you for completing the assessment.
-
-Your information has been received by NotablePath.
-
-A consultant will review your request and provide guidance based on Wikipedia standards.""",
-
+        "<b>Thank you for completing the assessment.</b>\n\nYour information has been received by NotablePath.\n\nA consultant will review your request and provide guidance based on Wikipedia standards.",
+        parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(
-
             inline_keyboard=[
-
                 [
-
-                    button(
-                        "Contact Consultant",
-                        "contact"
+                    InlineKeyboardButton(
+                        "Book Consultation",
+                        url=openConsultationBooking()
                     )
-
-                ]
-
+                ],
+                [
+                    button(
+                        "Main Menu",
+                        "about"
+                    )
+                ],
             ]
-
-        )
-
+        ),
     )
-
 
     await state.clear()
 
@@ -709,10 +627,26 @@ async def contact(callback:CallbackQuery):
 
     await callback.message.answer(
 
-        "A consultant will be available to review your request."
+        "A consultant will be available to review your request.",
+
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        "Book Consultation",
+                        url=openConsultationBooking(),
+                    )
+                ]
+            ]
+        )
 
     )
 
+
+
+@dp.errors()
+async def handle_errors(update, exception):
+    logging.exception("Update failed: %s", exception)
 
 
 # =========================
@@ -725,6 +659,12 @@ async def main():
     print(
         "NotablePath Bot Started"
     )
+
+    # Remove any webhook set for this bot (prevents TelegramConflictError)
+    try:
+        await bot.delete_webhook(drop_pending_updates=True)
+    except Exception:
+        logging.exception("Could not delete webhook; continuing to long-poll")
 
     await dp.start_polling(
         bot

@@ -1035,6 +1035,8 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     z-index: 2000;
     padding: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
 }
 
 .about-modal.active {
@@ -1049,6 +1051,8 @@ h1, h2, h3, h4, h5, h6 {
     padding: 2rem;
     box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
     position: relative;
+    max-height: calc(100vh - 3rem);
+    overflow: auto;
 }
 
 .about-close {
@@ -1156,6 +1160,8 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(10, 15, 28, 0.92);
     z-index: 3000;
     padding: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
 }
 
 .conversion-modal.active {
@@ -1171,6 +1177,22 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 30px 120px rgba(0, 0, 0, 0.5);
     position: relative;
     animation: modalPop 320ms ease-out;
+    max-height: calc(100vh - 3rem);
+    overflow: auto;
+}
+
+@media (max-width: 640px) {
+    .about-modal.active,
+    .conversion-modal.active {
+        align-items: flex-start;
+        padding-top: 1.25rem;
+        padding-bottom: 1.25rem;
+    }
+    .about-panel,
+    .conversion-panel {
+        border-radius: 1rem;
+        padding: 1.25rem;
+    }
 }
 
 @keyframes modalPop {
