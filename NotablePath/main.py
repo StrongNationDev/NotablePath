@@ -180,15 +180,8 @@ async def start(message: Message, state: FSMContext):
         )
 
     await message.answer(
-        """Welcome to NotablePath Assessment Assistant.
-
-NotablePath helps individuals and organizations understand Wikipedia requirements through research, source analysis, and professional consultation.
-
-Wikipedia is built on reliable information and editorial standards, not advertising.
-
-Answer a few questions and we will help you understand your next steps.
-
-By continuing, you agree that NotablePath may use your submitted information only to review your request and provide consultation assistance.""",
+        "<b>Welcome to NotablePath Assessment Assistant.</b>\n\nNotablePath helps individuals and organizations understand Wikipedia requirements through research, source analysis, and professional consultation.\n\n<i>Wikipedia is built on reliable information and editorial standards, not advertising.</i>\n\nAnswer a few questions and we will help you understand your next steps.\n\nBy continuing, you agree that NotablePath may use your submitted information only to review your request and provide consultation assistance.",
+        parse_mode="HTML",
         reply_markup=menu_keyboard(),
     )
 
@@ -530,63 +523,72 @@ async def finish(
 
 
 
-    result = save_assessment(supabase, record)
-    if result.error:
+    try:
+        result = save_assessment(supabase, record)
+    except Exception as e:
+        logging.exception("Supabase insert failed")
+        await message.answer(
+            "There was an issue saving your assessment. Please try again later."
+        )
+        try:
+            await bot.send_message(
+                ADMIN_GROUP_ID,
+                f"⚠️ <b>Failed to save assessment</b> for <i>{full_name}</i>:\n<pre>{e}</pre>",
+                parse_mode="HTML",
+            )
+        except Exception:
+            logging.exception("Failed to notify admin about save failure")
+        return
+
+    if getattr(result, "error", None):
         logging.error("Failed to save Telegram assessment: %s", result.error)
         await message.answer(
             "There was an issue saving your assessment. Please try again later."
         )
+        try:
+            await bot.send_message(
+                ADMIN_GROUP_ID,
+                f"⚠️ <b>Supabase error</b>: <pre>{result.error}</pre>",
+                parse_mode="HTML",
+            )
+        except Exception:
+            logging.exception("Failed to notify admin about supabase error")
         return
 
-
     admin_message = format_admin_message(record)
-
-    await bot.send_message(
-
-        ADMIN_GROUP_ID,
-
-        admin_message
-
-    )
+    try:
+        await bot.send_message(ADMIN_GROUP_ID, admin_message, parse_mode="HTML")
+    except Exception as e:
+        logging.exception("Failed to send admin message: %s", e)
+        owner = os.getenv("BOT_OWNER")
+        if owner:
+            try:
+                await bot.send_message(owner, f"Failed to deliver admin alert: {e}\n\nLead:\n{admin_message}", parse_mode="HTML")
+            except Exception:
+                logging.exception("Fallback admin notify failed")
 
 
 
     await message.answer(
-
-"""Thank you for completing the assessment.
-
-Your information has been received by NotablePath.
-
-A consultant will review your request and provide guidance based on Wikipedia standards.""",
-
+        "<b>Thank you for completing the assessment.</b>\n\nYour information has been received by NotablePath.\n\nA consultant will review your request and provide guidance based on Wikipedia standards.",
+        parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(
-
             inline_keyboard=[
-
                 [
-
                     InlineKeyboardButton(
                         "Book Consultation",
                         url=openConsultationBooking()
                     )
-
                 ],
-
                 [
-
                     button(
                         "Main Menu",
                         "about"
                     )
-
-                ]
-
+                ],
             ]
-
-        )
-
+        ),
     )
-
 
     await state.clear()
 
@@ -657,6 +659,12 @@ async def main():
     print(
         "NotablePath Bot Started"
     )
+
+    # Remove any webhook set for this bot (prevents TelegramConflictError)
+    try:
+        await bot.delete_webhook(drop_pending_updates=True)
+    except Exception:
+        logging.exception("Could not delete webhook; continuing to long-poll")
 
     await dp.start_polling(
         bot

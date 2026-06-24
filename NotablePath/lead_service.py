@@ -203,13 +203,13 @@ def format_admin_message(record):
     if source == "website":
         metadata = json.loads(record.get("consultant_notes", "{}"))
         return (
-            "🚨 New Website Assessment\n\n"
-            f"Readiness:\n{record.get('wiki_status', 'N/A')}\n\n"
-            f"Score:\n{metadata.get('readiness_score', 'N/A')}\n\n"
-            f"Profile:\n{record.get('request_type', 'N/A')}\n\n"
-            f"Coverage:\n{metadata.get('coverage_status', 'N/A')}\n\n"
-            "Source:\nWebsite\n\n"
-            f"Time:\n{metadata.get('timestamp', format_time())}\n\n"
+            "🚨 <b>New Website Assessment</b>\n\n"
+            f"<b>Readiness:</b> <i>{record.get('wiki_status', 'N/A')}</i>\n"
+            f"<b>Score:</b> <i>{metadata.get('readiness_score', 'N/A')}</i>\n"
+            f"<b>Profile:</b> <i>{record.get('request_type', 'N/A')}</i>\n"
+            f"<b>Coverage:</b> <i>{metadata.get('coverage_status', 'N/A')}</i>\n\n"
+            f"<b>Source:</b> Website\n"
+            f"<b>Time:</b> {metadata.get('timestamp', format_time())}\n\n"
             "--------------------------------"
         )
 
@@ -220,16 +220,16 @@ def format_admin_message(record):
         username = f"@{username}"
 
     return (
-        "🚨 New Telegram Assessment\n\n"
-        f"Name:\n{record.get('full_name', 'N/A')}\n\n"
-        f"Username:\n{username or 'N/A'}\n\n"
-        f"Request Type:\n{record.get('request_type', 'N/A')}\n\n"
-        f"Subject:\n{record.get('subject', 'N/A')}\n\n"
-        f"Coverage:\n{record.get('wiki_status', 'N/A')}\n\n"
-        f"Draft Submitted:\n{metadata.get('draft_status', 'N/A')}\n\n"
-        f"Goal:\n{record.get('goal', 'N/A')}\n\n"
-        f"Contact:\n{record.get('contact_value', 'N/A')}\n\n"
-        f"Source:\nTelegram\n\n"
-        f"Time:\n{metadata.get('recorded_at', format_time())}\n\n"
+        "🚨 <b>New Telegram Assessment</b>\n\n"
+        f"<b>Name:</b> <i>{record.get('full_name', 'N/A')}</i>\n"
+        f"<b>Username:</b> <i>{username or 'N/A'}</i>\n"
+        f"<b>Request Type:</b> <i>{record.get('request_type', 'N/A')}</i>\n"
+        f"<b>Subject:</b> <i>{record.get('subject', 'N/A')}</i>\n"
+        f"<b>Coverage:</b> <i>{record.get('wiki_status', 'N/A')}</i>\n"
+        f"<b>Draft Submitted:</b> <i>{metadata.get('draft_status', 'N/A')}</i>\n"
+        f"<b>Goal:</b> <i>{record.get('goal', 'N/A')}</i>\n"
+        f"<b>Contact:</b> <i>{record.get('contact_value', 'N/A')}</i>\n\n"
+        f"<b>Source:</b> Telegram\n"
+        f"<b>Time:</b> {metadata.get('recorded_at', format_time())}\n\n"
         "--------------------------------"
     )
