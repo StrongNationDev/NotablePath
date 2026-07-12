@@ -569,16 +569,21 @@ function initCopyLinkButton(article) {
   if (shareRow.querySelector('[data-copy-link]')) return;
 
   const button = document.createElement('button');
-  button.className = 'btn btn-secondary';
+  button.className = 'btn btn-secondary icon-button';
   button.setAttribute('data-copy-link', 'true');
-  button.textContent = 'Copy link';
+  button.setAttribute('type', 'button');
+  button.setAttribute('aria-label', 'Copy article link');
+  button.innerHTML = '⧉';
+  button.title = 'Copy link';
   button.addEventListener('click', async () => {
     const shareUrl = `https://notablepath.com/insights/${article.slug}/`;
     if (navigator.clipboard) {
       await navigator.clipboard.writeText(shareUrl);
-      button.textContent = 'Copied';
+      button.innerHTML = '✓';
+      button.title = 'Copied';
       setTimeout(() => {
-        button.textContent = 'Copy link';
+        button.innerHTML = '⧉';
+        button.title = 'Copy link';
       }, 1600);
     }
   });
