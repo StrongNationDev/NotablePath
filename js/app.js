@@ -755,6 +755,38 @@ function initFAQ() {
     });
 }
 
+function renderPublishedInsights() {
+    const container = document.getElementById('publishedInsightsGrid');
+    if (!container || typeof insightsArticles === 'undefined' || !Array.isArray(insightsArticles)) {
+        return;
+    }
+
+    const shuffled = [...insightsArticles].sort(() => 0.5 - Math.random());
+    const featured = shuffled.slice(0, Math.min(6, shuffled.length));
+
+    container.innerHTML = featured.map((article, index) => {
+        const imageUrl = article.image || 'images/insights/placeholder.svg';
+        const articleLink = `insights/${article.slug}/`;
+        const readingTime = article.readingTime || estimateReadingTime(article.body || article.excerpt || '');
+        const description = article.description || article.excerpt || '';
+        const animationType = index === 1 || index === 4 ? 'published-insight-up' : 'published-insight-down';
+
+        return `
+            <article class="published-insight-card ${animationType}">
+                <img class="published-insight-image" src="${imageUrl}" alt="${article.title}" loading="lazy" decoding="async">
+                <div class="published-insight-body">
+                    <div class="published-insight-meta">
+                        <span>${article.category || 'Insight'}</span>
+                        <span>${readingTime}</span>
+                    </div>
+                    <h3 class="published-insight-title">${article.title}</h3>
+                    <p class="published-insight-description">${description}</p>
+                    <a class="published-insight-link" href="${articleLink}">Read article</a>
+                </div>
+            </article>`;
+    }).join('');
+}
+
 /* ============================
    MAGNETIC BUTTON EFFECT
    ============================ */
@@ -926,6 +958,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollIndicator();
     initParallax();
     initCardAnimations();
+    renderPublishedInsights();
     
     const pageName = document.body.dataset.page || (window.location.pathname.includes('services') ? 'services' : 'homepage');
     trackEvent('PageView', { page: pageName });
