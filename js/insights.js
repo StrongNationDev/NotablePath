@@ -91,6 +91,203 @@ function estimateReadingTime(text) {
   return `${minutes} min read`;
 }
 
+function supportsSpeechSynthesis() {
+  return typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+}
+
+async function fetchLikeCount(slug) {
+  try {
+    const res = await fetch(`https://api.countapi.xyz/get/notablepath-likes/${encodeURIComponent(slug)}`);
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return Number(data.value || 0);
+  } catch (err) {
+    return 0;
+  }
+}
+
+async function hitLike(slug) {
+  try {
+    const res = await fetch(`https://api.countapi.xyz/hit/notablepath-likes/${encodeURIComponent(slug)}`);
+    if (!res.ok) throw new Error('Hit failed');
+    const data = await res.json();
+    return Number(data.value || 0);
+  } catch (err) {
+    throw err;
+  }
+}
+
+function initArticleAudioReader(article) {
+  const hero = document.querySelector('.article-hero');
+  const contentRoot = document.getElementById('articleContent');
+  if (!hero || !supportsSpeechSynthesis()) return;
+
+  let audioControl = hero.querySelector('.article-audio-reader');
+  if (audioControl) audioControl.remove();
+
+  audioControl = document.createElement('div');
+  audioControl.className = 'article-audio-reader';
+  audioControl.innerHTML = `
+    <button class="article-audio-toggle" type="button" aria-label="Listen to this article">
+      <span class="article-audio-icon">🔊</span>
+      <span class="article-audio-label">Listen to this article</span>
+    </button>
+    <button class="article-audio-stop" type="button">■ Stop</button>
+    <span class="article-audio-status">Ready</span>
+  `;
+
+  const metaTarget = hero.querySelector('.article-meta');
+  if (metaTarget) {
+    hero.insertBefore(audioControl, metaTarget);
+  } else {
+    hero.appendChild(audioControl);
+  }
+
+  const toggleButton = audioControl.querySelector('.article-audio-toggle');
+  const stopButton = audioControl.querySelector('.article-audio-stop');
+  const statusNode = audioControl.querySelector('.article-audio-status');
+  let segments = [];
+  let currentIndex = 0;
+  let currentUtterance = null;
+  let isPlaying = false;
+
+  function getSegments() {
+    if (!contentRoot) return [];
+    const rawSegments = Array.from(contentRoot.querySelectorAll('p, li, blockquote'));
+    return rawSegments
+      .map(node => {
+        const text = String(node.innerText || '').replace(/\s+/g, ' ').trim();
+        return text ? { node, text } : null;
+      })
+      .filter(Boolean);
+  }
+
+  function clearHighlight() {
+    document.querySelectorAll('.audio-active').forEach(node => node.classList.remove('audio-active'));
+  }
+
+  function setHighlight(segment) {
+    clearHighlight();
+    if (segment?.node) {
+      segment.node.classList.add('audio-active');
+    }
+  }
+
+  function updateStatus(message) {
+    if (statusNode) statusNode.textContent = message;
+  }
+
+  function setButtonState(state) {
+    const labelNode = toggleButton?.querySelector('.article-audio-label');
+    if (!toggleButton || !labelNode) return;
+    if (state === 'playing') {
+      toggleButton.classList.add('is-playing');
+      labelNode.textContent = 'Pause audio';
+      toggleButton.setAttribute('aria-pressed', 'true');
+    } else if (state === 'paused') {
+      toggleButton.classList.remove('is-playing');
+      labelNode.textContent = 'Resume audio';
+      toggleButton.setAttribute('aria-pressed', 'false');
+    } else {
+      toggleButton.classList.remove('is-playing');
+      labelNode.textContent = 'Listen to this article';
+      toggleButton.setAttribute('aria-pressed', 'false');
+    }
+  }
+
+  function stopPlayback() {
+    window.speechSynthesis.cancel();
+    clearHighlight();
+    currentUtterance = null;
+    isPlaying = false;
+    setButtonState('stopped');
+    updateStatus('Stopped');
+  }
+
+  function speakNext() {
+    if (!segments.length) {
+      updateStatus('No readable text available');
+      return;
+    }
+
+    if (currentIndex >= segments.length) {
+      isPlaying = false;
+      setButtonState('stopped');
+      updateStatus('Finished');
+      currentIndex = 0;
+      return;
+    }
+
+    const segment = segments[currentIndex];
+    currentUtterance = new SpeechSynthesisUtterance(segment.text);
+    currentUtterance.lang = 'en-US';
+    currentUtterance.rate = 0.96;
+    currentUtterance.pitch = 1;
+
+    currentUtterance.onstart = () => {
+      isPlaying = true;
+      setHighlight(segment);
+      setButtonState('playing');
+      updateStatus('Reading now');
+    };
+
+    currentUtterance.onend = () => {
+      clearHighlight();
+      currentIndex += 1;
+      if (currentIndex < segments.length && isPlaying) {
+        speakNext();
+      } else {
+        isPlaying = false;
+        setButtonState('stopped');
+        updateStatus('Finished');
+        currentIndex = 0;
+      }
+    };
+
+    currentUtterance.onerror = () => {
+      clearHighlight();
+      currentIndex += 1;
+      if (currentIndex < segments.length && isPlaying) {
+        speakNext();
+      }
+    };
+
+    window.speechSynthesis.speak(currentUtterance);
+  }
+
+  function beginPlayback() {
+    segments = getSegments();
+    if (!segments.length) {
+      updateStatus('No readable text available');
+      return;
+    }
+    currentIndex = 0;
+    speakNext();
+  }
+
+  toggleButton?.addEventListener('click', () => {
+    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+      window.speechSynthesis.pause();
+      isPlaying = false;
+      setButtonState('paused');
+      updateStatus('Paused');
+      return;
+    }
+
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      isPlaying = true;
+      setButtonState('playing');
+      updateStatus('Resuming');
+      return;
+    }
+
+    beginPlayback();
+  });
+
+  stopButton?.addEventListener('click', stopPlayback);
+}
+
 function renderMarkdownContent(markdown, article) {
   const source = addInternalLinks(markdown, article);
   const lines = source.split(/\r?\n/);
@@ -244,14 +441,14 @@ function renderInsightsLanding() {
       const matchesSearch = !normalized || haystack.includes(normalized);
       return matchesCategory && matchesSearch;
     });
-
+    
     if (!filtered.length) {
       grid.innerHTML = '<div class="insights-panel"><h3>No insights match that search.</h3><p>Try a broader keyword or switch category.</p></div>';
       return;
     }
 
     grid.innerHTML = filtered.map(article => `
-      <article class="insight-card">
+      <article class="insight-card" data-slug="${article.slug}">
         <img src="${article.image}" alt="${article.title}" loading="lazy">
         <div class="insight-card-body">
           <div class="insight-meta">
@@ -262,11 +459,47 @@ function renderInsightsLanding() {
           <p>${article.description}</p>
           <div class="insight-card-footer">
             <span>${formatDate(article.date)}</span>
-            <a class="btn btn-secondary" href="${getInsightHref(article.slug)}">Read More</a>
+            <div class="insight-card-actions">
+              <a class="btn btn-secondary" href="${getInsightHref(article.slug)}">Read More</a>
+              <button class="like-btn" data-slug="${article.slug}" aria-pressed="false">👍 <span class="like-count" id="likes-${article.slug}">—</span></button>
+            </div>
           </div>
         </div>
       </article>
     `).join('');
+
+    // After rendering, bind like button events and fetch counts
+    setTimeout(() => {
+      document.querySelectorAll('.like-btn').forEach(btn => {
+        const slug = btn.dataset.slug;
+        const countNode = document.getElementById(`likes-${slug}`);
+        fetchLikeCount(slug).then(count => {
+          if (countNode) countNode.textContent = String(count);
+          if (count >= 10) btn.disabled = true;
+        }).catch(() => {
+          if (countNode) countNode.textContent = '0';
+        });
+
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          btn.disabled = true;
+          const current = await fetchLikeCount(slug).catch(() => 0);
+          if (current >= 10) {
+            if (countNode) countNode.textContent = String(current);
+            btn.disabled = true;
+            return;
+          }
+          try {
+            const newCount = await hitLike(slug);
+            if (countNode) countNode.textContent = String(newCount);
+            if (newCount >= 10) btn.disabled = true;
+          } catch (err) {
+            // restore button if failed
+            btn.disabled = false;
+          }
+        });
+      });
+    }, 20);
   }
 
   filterGroup.innerHTML = insightCategories.map(category => `
@@ -327,6 +560,7 @@ function renderArticlePage() {
   initReadingProgress();
   initCopyLinkButton(article);
   initBackToTop();
+  initArticleAudioReader(article);
 }
 
 function injectArticleMetadata(article) {
@@ -347,8 +581,37 @@ function injectArticleMetadata(article) {
       <span class="article-updated">Last updated ${formatDate(article.updatedDate || article.date)}</span>
     </div>
     ${article.excerpt ? `<p class="article-excerpt">${article.excerpt}</p>` : ''}
+    <div class="article-like" style="margin-top:0.6rem;">
+      <button class="like-btn" id="article-like-btn" data-slug="${article.slug}">👍 <span id="article-like-count">—</span></button>
+    </div>
   `;
   hero.appendChild(details);
+
+  // populate like count for article page
+  (async () => {
+    try {
+      const count = await fetchLikeCount(article.slug);
+      const node = document.getElementById('article-like-count');
+      const btn = document.getElementById('article-like-btn');
+      if (node) node.textContent = String(count);
+      if (btn) {
+        if (count >= 10) btn.disabled = true;
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          btn.disabled = true;
+          const cur = await fetchLikeCount(article.slug).catch(()=>0);
+          if (cur >= 10) { if(node) node.textContent = String(cur); btn.disabled = true; return; }
+          try {
+            const nc = await hitLike(article.slug);
+            if (node) node.textContent = String(nc);
+            if (nc >= 10) btn.disabled = true; else btn.disabled = false;
+          } catch (err) { btn.disabled = false; }
+        });
+      }
+    } catch (err) {
+      // ignore
+    }
+  })();
 }
 
 function updateMetadata(article) {

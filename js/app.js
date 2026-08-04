@@ -624,10 +624,128 @@ function openTelegramAssistant() {
     });
 }
 
-function openConsultationBooking() {
-    const bookingUrl = 'https://calendly.com/notablepath/30min';
-    window.open(bookingUrl, '_blank');
-    trackEvent('OpenConsultationBooking', {});
+function openConsultationRequest() {
+    const modal = document.getElementById('consultationModal');
+    if (!modal) return;
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    const firstField = modal.querySelector('input[name="name"]');
+    firstField?.focus();
+    trackEvent('OpenConsultationRequest', {});
+}
+
+function closeConsultationModal() {
+    const modal = document.getElementById('consultationModal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+}
+
+async function submitConsultationRequest(payload) {
+    const endpoint = 'https://formsubmit.co/ajax/notablepathc@gmail.com';
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            _subject: 'NotablePath Consultation Request',
+            _captcha: 'false',
+            _template: 'table',
+            ...payload
+        })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Unable to submit consultation request');
+    }
+
+    return response.text();
+}
+
+async function handleConsultationFormSubmit(event, form, statusElement) {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+    const values = Object.fromEntries(formData.entries());
+    const fullName = [values.firstName, values.lastName].filter(Boolean).join(' ').trim() || values.name || '';
+    const payload = {
+        name: fullName || 'Website Visitor',
+        firstName: values.firstName || '',
+        lastName: values.lastName || '',
+        companyWebsite: values.companyWebsite || '',
+        email: values.email || '',
+        phone: values.phone || '',
+        telegramUsername: values.telegramUsername || '',
+        subject: values.subject || '',
+        preferredDate: values.preferredDate || '',
+        preferredTime: values.preferredTime || '',
+        timezone: values.timezone || '',
+        reason: values.reason || '',
+        source: values.source || form.id,
+        message: [
+            `Name: ${fullName || values.name || 'Website Visitor'}`,
+            `Email: ${values.email || ''}`,
+            `Phone: ${values.phone || ''}`,
+            `Company Website: ${values.companyWebsite || ''}`,
+            `Telegram Username: ${values.telegramUsername || ''}`,
+            `Preferred Date: ${values.preferredDate || ''}`,
+            `Preferred Time: ${values.preferredTime || ''}`,
+            `Timezone: ${values.timezone || ''}`,
+            `Reason: ${values.reason || ''}`
+        ].join('\n')
+    };
+
+    if (!payload.email || !payload.subject || !payload.reason) {
+        if (statusElement) {
+            statusElement.textContent = 'Please complete the required fields so we can follow up.';
+            statusElement.classList.add('error');
+        }
+        return;
+    }
+
+    if (statusElement) {
+        statusElement.textContent = 'Sending your request...';
+        statusElement.classList.remove('error');
+    }
+
+    try {
+        await submitConsultationRequest(payload);
+        if (statusElement) {
+            statusElement.textContent = 'Thank you. We\'ve received your consultation request. Please check your inbox and spam folder for a reply within 30 minutes.';
+        }
+        form.reset();
+        window.alert('Thank you. We\'ve received your consultation request. Please check your inbox and spam folder for a reply within 30 minutes.');
+        closeConsultationModal();
+        trackEvent('ConsultationRequestSubmitted', { source: payload.source });
+    } catch (error) {
+        if (statusElement) {
+            statusElement.textContent = 'We could not send the request automatically. Please email hello@notablepath.online directly.';
+            statusElement.classList.add('error');
+        }
+        trackEvent('ConsultationRequestFailed', { error: error.message });
+    }
+}
+
+function initHeroConsultationForm() {
+    const form = document.getElementById('heroConsultationForm');
+    const statusElement = form?.querySelector('.hero-form-status');
+
+    if (!form) return;
+
+    form.addEventListener('submit', (event) => handleConsultationFormSubmit(event, form, statusElement));
+}
+
+function initConsultationModalForm() {
+    const form = document.getElementById('consultationRequestForm');
+    const statusElement = form?.querySelector('.consultation-form-status');
+
+    if (!form) return;
+
+    form.addEventListener('submit', (event) => handleConsultationFormSubmit(event, form, statusElement));
 }
 
 async function submitAssessment() {
@@ -730,7 +848,23 @@ function initConversionModal() {
     });
 
     document.querySelector('[data-action="open-telegram-assistant"]')?.addEventListener('click', openTelegramAssistant);
-    document.querySelector('[data-action="open-consultation-booking"]')?.addEventListener('click', openConsultationBooking);
+    document.querySelector('[data-action="open-consultation-request"]')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        openConsultationRequest();
+    });
+    document.querySelectorAll('[data-action="close-consultation-modal"]').forEach(element => {
+        element.addEventListener('click', () => closeConsultationModal());
+    });
+    document.getElementById('consultationModal')?.addEventListener('click', (event) => {
+        if (event.target === event.currentTarget) {
+            closeConsultationModal();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeConsultationModal();
+        }
+    });
 }
 
 /* ============================
@@ -800,20 +934,46 @@ function renderPublishedInsights() {
         const description = article.description || article.excerpt || '';
         const animationType = index === 1 || index === 4 ? 'published-insight-up' : 'published-insight-down';
 
-        return `
-            <article class="published-insight-card ${animationType}">
-                <img class="published-insight-image" src="${imageUrl}" alt="${article.title}" loading="lazy" decoding="async">
-                <div class="published-insight-body">
-                    <div class="published-insight-meta">
-                        <span>${article.category || 'Insight'}</span>
-                        <span>${readingTime}</span>
-                    </div>
-                    <h3 class="published-insight-title">${article.title}</h3>
-                    <p class="published-insight-description">${description}</p>
-                    <a class="published-insight-link" href="${articleLink}">Read article</a>
-                </div>
-            </article>`;
+                return `
+                        <article class="published-insight-card ${animationType}">
+                                <img class="published-insight-image" src="${imageUrl}" alt="${article.title}" loading="lazy" decoding="async">
+                                <div class="published-insight-body">
+                                        <div class="published-insight-meta">
+                                                <span>${article.category || 'Insight'}</span>
+                                                <span>${readingTime}</span>
+                                        </div>
+                                        <h3 class="published-insight-title">${article.title}</h3>
+                                        <p class="published-insight-description">${description}</p>
+                                        <div style="display:flex;gap:0.6rem;align-items:center">
+                                            <a class="published-insight-link" href="${articleLink}">Read article</a>
+                                            <button class="like-btn" data-slug="${article.slug}" aria-pressed="false">👍 <span class="like-count" id="likes-${article.slug}">—</span></button>
+                                        </div>
+                                </div>
+                        </article>`;
     }).join('');
+
+        // bind like buttons for featured
+        setTimeout(() => {
+            container.querySelectorAll('.like-btn').forEach(btn => {
+                const slug = btn.dataset.slug;
+                const node = document.getElementById(`likes-${slug}`);
+                // fetch current count
+                fetch(`https://api.countapi.xyz/get/notablepath-likes/${encodeURIComponent(slug)}`).then(r=>r.ok? r.json(): {value:0}).then(d=>{ const c = Number(d.value||0); if(node) node.textContent=String(c); if(c>=10) btn.disabled=true; }).catch(()=>{ if(node) node.textContent='0'; });
+                btn.addEventListener('click', async (e)=>{
+                    e.preventDefault(); btn.disabled=true; try{
+                        const curRes = await fetch(`https://api.countapi.xyz/get/notablepath-likes/${encodeURIComponent(slug)}`);
+                        const cur = curRes.ok ? Number((await curRes.json()).value||0) : 0;
+                        if (cur >= 10) { if(node) node.textContent=String(cur); btn.disabled=true; return; }
+                        const hitRes = await fetch(`https://api.countapi.xyz/hit/notablepath-likes/${encodeURIComponent(slug)}`);
+                        if (!hitRes.ok) throw new Error('hit failed');
+                        const hitData = await hitRes.json();
+                        const nc = Number(hitData.value||0);
+                        if (node) node.textContent = String(nc);
+                        if (nc >= 10) btn.disabled = true; else btn.disabled = false;
+                    } catch (err) { btn.disabled=false; }
+                });
+            });
+        }, 20);
 }
 
 /* ============================
@@ -970,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         new HeroNetwork('.network-lines', '.visual-overlay .source-card', '.network-node');
     }
     if (document.getElementById('logoParticleCanvas')) {
-        new LogoParticles('logoParticleCanvas', '.hero-logo-img img');
+        new LogoParticles('logoParticleCanvas', '.hero-media-stage');
     }
     
     // Initialize all features
@@ -982,6 +1142,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileNavbar();
     initAboutModal();
     initConversionModal();
+    initHeroConsultationForm();
+    initConsultationModalForm();
     initAnalyticsTracking();
     initTimelineAnimation();
     initScrollIndicator();

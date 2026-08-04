@@ -100,9 +100,23 @@
 
 
     <!-- Hero Section -->
+     
     <section class="hero">
         <canvas id="particleCanvas"></canvas>
         <canvas id="connectorCanvas"></canvas>
+        <div class="hero-media-stage" aria-hidden="true">
+            <!-- Background image is applied via CSS for better layering; overlays sit above -->
+            <div class="hero-media-grid" aria-hidden="true"></div>
+            <div class="hero-media-ring hero-ring-a" aria-hidden="true"></div>
+            <div class="hero-media-ring hero-ring-b" aria-hidden="true"></div>
+            <div class="hero-media-glow" aria-hidden="true"></div>
+            <canvas id="logoParticleCanvas" class="logo-particles" aria-hidden="true"></canvas>
+            <svg class="network-lines" viewBox="0 0 800 600" preserveAspectRatio="none" aria-hidden="true"></svg>
+            <div class="network-node node-1"></div>
+            <div class="network-node node-2"></div>
+            <div class="network-node node-3"></div>
+            <div class="network-node node-4"></div>
+        </div>
         <div class="hero-content">
             <div class="hero-text">
                 <h1 class="hero-title">Wikipedia is not a marketing platform.</h1>
@@ -114,16 +128,34 @@
                 </div>
             </div>
             <div class="hero-visualization">
-                <div class="hero-logo-img" aria-hidden="true">
-                    <img src="images/scifii.png" alt="Encyclopedia" loading="lazy">
-                    <canvas id="logoParticleCanvas" class="logo-particles" aria-hidden="true"></canvas>
-                    <div class="logo-glow"></div>
+                <div class="hero-visual-shell">
+                    <div class="hero-consultation-card">
+                        <div class="hero-consultation-card-head">
+                            <span class="hero-consultation-eyebrow">Consultation intake</span>
+                            <h3>Request a tailored consultation</h3>
+                        </div>
+                        <form id="heroConsultationForm" class="hero-consultation-form" novalidate>
+                            <div class="hero-form-row">
+                                <label>First name<input type="text" name="firstName" required></label>
+                                <label>Last name<input type="text" name="lastName" required></label>
+                            </div>
+                            <div class="hero-form-row">
+                                <label>Company website<input type="url" name="companyWebsite" placeholder="https://"></label>
+                                <label>Email<input type="email" name="email" required></label>
+                            </div>
+                            <div class="hero-form-row">
+                                <label>Phone<input type="tel" name="phone" placeholder="+1 555 000 0000"></label>
+                                <label>Preferred date<input type="date" name="preferredDate"></label>
+                            </div>
+                            <div class="hero-form-row hero-form-row-single">
+                                <label>What you want<input type="text" name="subject" placeholder="Assessment, drafting support..." required></label>
+                            </div>
+                            <label class="hero-form-textarea">Short description<textarea name="reason" rows="3" placeholder="Tell us what you need..." required></textarea></label>
+                            <button class="btn btn-primary" type="submit">Request Consultation</button>
+                            <p class="hero-form-status" role="status" aria-live="polite"></p>
+                        </form>
+                    </div>
                 </div>
-                <svg class="network-lines" viewBox="0 0 800 600" preserveAspectRatio="none" aria-hidden="true"></svg>
-                <div class="network-node node-1"></div>
-                <div class="network-node node-2"></div>
-                <div class="network-node node-3"></div>
-                <div class="network-node node-4"></div>
             </div>
         </div>
         <div class="scroll-indicator">
@@ -414,7 +446,7 @@
                 <div class="conversion-card">
                     <h3>Consultation Request</h3>
                     <p>Request a direct consultation focused on your Wikipedia readiness and next steps.</p>
-                    <button class="btn btn-secondary" type="button" data-action="open-consultation-booking" data-analytics="open-consultation-booking">Request Consultation</button>
+                    <button class="btn btn-secondary" type="button" data-action="open-consultation-request" data-analytics="open-consultation-request">Request Consultation</button>
                 </div>
             </div>
             <p class="conversion-footnote">Your assessment has been saved securely and shared with our team for fast follow-up.</p>
@@ -686,6 +718,19 @@
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.48-1.13 7.26-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.6.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.06-.15-.04-.24-.02-.1.02-1.7 1.07-4.83 3.18-.46.31-.87.46-1.22.45-.4-.01-1.16-.22-1.73-.42-.7-.23-1.25-.35-1.2-.74.03-.39.49-.77 1.35-1.16 5.32-2.32 6.27-2.72 6.97-2.83.31-.05.82-.01 1.18.18.3.16.48.38.52.74z"/>
                             </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h5>Contact</h5>
+                    <div class="footer-contact-list">
+                        <a class="footer-contact-item" href="mailto:hello@notablepath.online">
+                            <span class="footer-contact-icon" aria-hidden="true">✉</span>
+                            <span>hello@notablepath.online</span>
+                        </a>
+                        <a class="footer-contact-item" href="mailto:contact@notablepath.online">
+                            <span class="footer-contact-icon" aria-hidden="true">✉</span>
+                            <span>contact@notablepath.online</span>
                         </a>
                     </div>
                 </div>

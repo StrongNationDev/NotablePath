@@ -254,6 +254,71 @@ body {
     margin-bottom: 1.2rem;
 }
 
+.article-audio-reader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0 1.3rem;
+}
+
+.article-audio-toggle,
+.article-audio-stop {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.7rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 212, 255, 0.24);
+    background: rgba(0, 212, 255, 0.08);
+    color: var(--insight-text);
+    cursor: pointer;
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.article-audio-toggle:hover,
+.article-audio-stop:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 212, 255, 0.34);
+    background: rgba(0, 212, 255, 0.14);
+}
+
+.article-audio-toggle.is-playing {
+    background: rgba(123, 97, 255, 0.18);
+    border-color: rgba(123, 97, 255, 0.26);
+}
+
+.article-audio-status {
+    color: var(--insight-muted);
+    font-size: 0.92rem;
+}
+
+.article-content p.audio-active,
+.article-content li.audio-active,
+.article-content blockquote.audio-active {
+    background: rgba(0, 212, 255, 0.08);
+    border-left: 2px solid var(--insight-accent);
+    padding-left: 0.7rem;
+    transition: background 0.2s ease;
+}
+
+.like-btn {
+    appearance: none;
+    border: 1px solid rgba(148,163,184,0.12);
+    background: rgba(0,212,255,0.04);
+    color: var(--insight-text);
+    padding: 0.5rem 0.7rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.insight-card-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
 .article-hero-meta {
     margin-top: 1rem;
     padding: 1rem 1.1rem;

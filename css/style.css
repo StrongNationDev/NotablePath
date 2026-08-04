@@ -323,6 +323,32 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
     overflow: hidden;
     padding-top: 80px;
+    background-image: url('../images/new-back-wires-bg.png');
+    background-size: 100% auto;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 3;
+}
+
+.hero-visualization {
+    position: relative;
+    z-index: 3;
 }
 
 #particleCanvas {
@@ -331,7 +357,8 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1;
+    pointer-events: none;
+    z-index: 2;
 }
 
 #connectorCanvas {
@@ -340,20 +367,8 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 2;
     pointer-events: none;
-}
-
-.hero-content {
-    position: relative;
     z-index: 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
 }
 
 .hero-text h1 {
@@ -386,61 +401,239 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-visualization {
     position: relative;
-    height: 420px;
-    display: flex;
-    align-items: center;
+        min-height: 560px;
     justify-content: center;
     overflow: hidden;
 }
 
-/* Hero image (scifii) container */
-.hero-logo-img {
-    position: relative;
-    z-index: 4;
-    width: 420px;
-    height: 420px;
+/* Hero media stage */
+.hero-visual-shell {
+    width: min(100%, 500px);
     display: block;
-    align-self: center;
-    justify-self: center;
 }
 
-.hero-logo-img img {
+.hero-media-stage {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    background: transparent;
+    isolation: isolate;
+    transform-style: preserve-3d;
+}
+
+.hero-media-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    z-index: 0;
+}
+
+.hero-media-stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
-    border-radius: 14px;
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
-    transform-origin: 50% 50%;
-    animation: logoSpin 30s linear infinite;
+    filter: saturate(1.05) contrast(1.02);
+}
+
+.hero-media-grid {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    opacity: 0.28;
+    mix-blend-mode: screen;
+    animation: driftGrid 16s linear infinite;
+}
+
+.hero-media-ring { z-index: 2; }
+.hero-media-ring.hero-ring-a { z-index: 2; }
+.hero-media-ring.hero-ring-b { z-index: 2; }
+.hero-media-glow { z-index: 2; }
+.logo-particles { z-index: 3; pointer-events: none; }
+.network-lines { z-index: 4; pointer-events: none; }
+.network-node { z-index: 5; }
+
+.hero-media-ring {
+    position: absolute;
+    inset: 8%;
+    border: 1px solid rgba(0, 212, 255, 0.24);
+    border-radius: 50%;
+    animation: orbitSlow 9s ease-in-out infinite;
+}
+
+.hero-ring-b {
+    inset: 18%;
+    border-color: rgba(123, 97, 255, 0.24);
+    animation-duration: 12s;
+    animation-direction: reverse;
+}
+
+.hero-media-glow {
+    position: absolute;
+    inset: auto 10% 4% 10%;
+    height: 40%;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.18), transparent 70%);
+    filter: blur(16px);
+    animation: heroPulse 7s ease-in-out infinite;
 }
 
 .logo-particles {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
     z-index: 6;
 }
 
-.logo-glow {
+.network-lines {
     position: absolute;
-    width: 600px;
-    height: 600px;
-    left: 50%;
-    top: 45%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0,212,255,0.12), transparent 40%);
-    filter: blur(28px);
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.75;
     z-index: 2;
 }
 
-@keyframes logoSpin {
-    from { transform: rotate(0deg) }
-    to { transform: rotate(360deg) }
+.network-line {
+    stroke: rgba(0, 212, 255, 0.4);
+    stroke-width: 1.2;
+    fill: none;
+    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.12));
+}
+
+.hero-consultation-card {
+    padding: 1rem;
+    border-radius: 1.15rem;
+    border: 1px solid rgba(0, 212, 255, 0.16);
+    background: rgba(10, 15, 28, 0.82);
+    box-shadow: 0 18px 60px rgba(2, 8, 23, 0.24);
+}
+
+.hero-media-stage > * {
+    position: absolute;
+    inset: 0;
+}
+
+/* Explicit layering for hero media children (background image is ::before with z-index:0) */
+.hero-media-stage .hero-media-grid { z-index: 1; pointer-events: none; }
+.hero-media-stage .hero-media-ring { z-index: 2; pointer-events: none; }
+.hero-media-stage .hero-media-glow { z-index: 2; pointer-events: none; }
+.hero-media-stage svg.network-lines { z-index: 3; pointer-events: none; }
+.hero-media-stage #particleCanvas { z-index: 3; }
+.hero-media-stage #connectorCanvas { z-index: 4; }
+.hero-media-stage #logoParticleCanvas { z-index: 5; }
+.hero-media-stage .network-node { z-index: 6; pointer-events: none; }
+
+.hero-consultation-card {
+    align-self: center;
+    justify-self: end;
+    width: 100%;
+}
+
+.hero-consultation-card-head {
+    margin-bottom: 0.8rem;
+}
+
+.hero-consultation-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #00D4FF;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 0.45rem;
+}
+
+.hero-consultation-card h3 {
+    font-size: 1rem;
+    color: #F8FAFC;
+    margin: 0;
+}
+
+.hero-consultation-form,
+.consultation-form {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.hero-form-row,
+.consultation-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+}
+
+.hero-form-row-single,
+.full-width {
+    grid-template-columns: 1fr;
+}
+
+.hero-consultation-form label,
+.consultation-form label {
+    display: grid;
+    gap: 0.35rem;
+    color: #94A3B8;
+    font-size: 0.8rem;
+}
+
+.hero-consultation-form input,
+.hero-consultation-form textarea,
+.consultation-form input,
+.consultation-form select,
+.consultation-form textarea {
+    width: 100%;
+    padding: 0.78rem 0.85rem;
+    border-radius: 0.8rem;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(15, 23, 42, 0.85);
+    color: #F8FAFC;
+    font: inherit;
+}
+
+.hero-consultation-form input:focus,
+.hero-consultation-form textarea:focus,
+.consultation-form input:focus,
+.consultation-form select:focus,
+.consultation-form textarea:focus {
+    outline: none;
+    border-color: rgba(0, 212, 255, 0.38);
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.12);
+}
+
+.hero-form-status,
+.consultation-form-status {
+    min-height: 1.1rem;
+    color: #00D4FF;
+    font-size: 0.9rem;
+}
+
+.hero-form-status.error,
+.consultation-form-status.error {
+    color: #fda4af;
+}
+
+@keyframes driftGrid {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-40px, 40px, 0); }
+}
+
+@keyframes orbitSlow {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.03); }
+}
+
+@keyframes heroPulse {
+    0%, 100% { transform: translateY(0); opacity: 0.7; }
+    50% { transform: translateY(-12px); opacity: 1; }
 }
 
 .hero-title,
@@ -1563,11 +1756,21 @@ h1, h2, h3, h4, h5, h6 {
     .conversion-grid {
         grid-template-columns: 1fr;
     }
+    .hero-form-row,
+    .consultation-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {
     .conversion-panel {
         padding: 1.5rem;
+    }
+    .hero-media-stage {
+        min-height: 260px;
+    }
+    .hero-consultation-card {
+        padding: 0.9rem;
     }
 }
 
@@ -1832,6 +2035,38 @@ h1, h2, h3, h4, h5, h6 {
     border-top: 1px solid rgba(0, 212, 255, 0.05);
     color: #94A3B8;
     font-size: 0.9rem;
+}
+
+/* ============================
+   FOOTER CONTACT LINKS
+   ============================ */
+
+.footer-contact-list {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.footer-contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #94A3B8;
+    transition: color 0.3s ease;
+}
+
+.footer-contact-item:hover {
+    color: #00D4FF;
+}
+
+.footer-contact-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 0.7rem;
+    background: rgba(0, 212, 255, 0.1);
+    color: #00D4FF;
 }
 
 /* ============================
