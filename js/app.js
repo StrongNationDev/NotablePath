@@ -384,12 +384,32 @@ function initAboutModal() {
     const aboutModal = document.getElementById('aboutModal');
     const aboutTrigger = document.querySelector('.nav-about-trigger');
     const aboutClose = document.querySelector('.about-close');
+    const ABOUT_MODAL_STORAGE_KEY = 'notablepath_about_modal_shown';
+
+    function hasSeenAboutModal() {
+        try {
+            return sessionStorage.getItem(ABOUT_MODAL_STORAGE_KEY) === '1';
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function markAboutModalSeen() {
+        try {
+            sessionStorage.setItem(ABOUT_MODAL_STORAGE_KEY, '1');
+        } catch (error) {
+            console.warn('Unable to persist modal visibility state', error);
+        }
+    }
 
     function openModal() {
         if (!aboutModal) return;
+        if (hasSeenAboutModal()) return;
+
         aboutModal.classList.add('active');
         aboutModal.setAttribute('aria-hidden', 'false');
         trackEvent('AboutModalOpened');
+        markAboutModalSeen();
     }
 
     function closeModal() {
@@ -412,7 +432,7 @@ function initAboutModal() {
             }
         });
     }
-    setTimeout(openModal, 1000);
+    setTimeout(openModal, 10000);
 }
 
 function initAnalyticsTracking() {
@@ -626,13 +646,22 @@ function openTelegramAssistant() {
 
 function openConsultationRequest() {
     const modal = document.getElementById('consultationModal');
-    if (!modal) return;
-    modal.classList.add('active');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('modal-open');
-    const firstField = modal.querySelector('input[name="name"]');
-    firstField?.focus();
-    trackEvent('OpenConsultationRequest', {});
+    if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+        const firstField = modal.querySelector('input[name="name"]');
+        firstField?.focus();
+        trackEvent('OpenConsultationRequest', {});
+        return;
+    }
+
+    const heroForm = document.getElementById('heroConsultationForm');
+    if (heroForm) {
+        heroForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        heroForm.querySelector('input[name="firstName"]')?.focus();
+    }
+    trackEvent('OpenConsultationRequest', { fallback: 'hero_form' });
 }
 
 function closeConsultationModal() {
@@ -644,26 +673,41 @@ function closeConsultationModal() {
 }
 
 async function submitConsultationRequest(payload) {
-    const endpoint = 'https://formsubmit.co/ajax/notablepathc@gmail.com';
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-            _subject: 'NotablePath Consultation Request',
-            _captcha: 'false',
-            _template: 'table',
-            ...payload
-        })
+    const endpoints = [
+        'https://formsubmit.co/ajax/hello@notablepath.online',
+        'https://formsubmit.co/ajax/notablepathc@gmail.com'
+    ];
+    const body = new URLSearchParams({
+        _subject: 'NotablePath Consultation Request',
+        _replyto: payload.email || '',
+        _captcha: 'false',
+        _template: 'table',
+        ...payload
     });
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Unable to submit consultation request');
+    let lastError = null;
+    for (const endpoint of endpoints) {
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body
+            });
+
+            if (response.ok) {
+                return response.text();
+            }
+
+            const errorText = await response.text();
+            lastError = new Error(`${response.status}: ${errorText}`);
+        } catch (error) {
+            lastError = error;
+        }
     }
 
-    return response.text();
+    throw lastError || new Error('Unable to submit consultation request');
 }
 
 async function handleConsultationFormSubmit(event, form, statusElement) {
@@ -1087,10 +1131,10 @@ function initScrollIndicator() {
 
 function initParallax() {
     window.addEventListener('scroll', () => {
-        const heroVisualization = document.querySelector('.hero-visualization');
-        if (heroVisualization) {
+        const heroMediaStage = document.querySelector('.hero-media-stage');
+        if (heroMediaStage) {
             const scrollPosition = window.scrollY;
-            heroVisualization.style.transform = `translateY(${scrollPosition * 0.3}px)`;
+            heroMediaStage.style.transform = `translateY(${scrollPosition * 0.08}px)`;
         }
     });
 }
@@ -1147,7 +1191,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initAnalyticsTracking();
     initTimelineAnimation();
     initScrollIndicator();
-    initParallax();
     initCardAnimations();
     initWhatsAppButton();
     renderPublishedInsights();

@@ -67,7 +67,12 @@ function addInternalLinks(text, currentArticle) {
     { phrase: 'marketing platform', slug: 'wikipedia-is-not-a-marketing-platform', label: 'Marketing Platform' },
     { phrase: 'readiness assessment', slug: 'preparing-for-a-wikipedia-readiness-assessment', label: 'Readiness Assessment' },
     { phrase: 'promotion and documentation', slug: 'the-difference-between-promotion-and-documentation', label: 'Promotion and Documentation' },
-    { phrase: 'common misconceptions', slug: 'common-misconceptions-about-wikipedia', label: 'Common Misconceptions' }
+    { phrase: 'common misconceptions', slug: 'common-misconceptions-about-wikipedia', label: 'Common Misconceptions' },
+    { phrase: 'how to create a wikipedia page', slug: 'how-to-create-a-wikipedia-page', label: 'How to Create a Wikipedia Page' },
+    { phrase: 'can anyone create a wikipedia page', slug: 'can-anyone-create-a-wikipedia-page', label: 'Can Anyone Create a Wikipedia Page' },
+    { phrase: 'wikipedia page for business', slug: 'wikipedia-page-for-business', label: 'Wikipedia Page for Business' },
+    { phrase: 'wikipedia editors', slug: 'wikipedia-editors-explained', label: 'Wikipedia Editors' },
+    { phrase: 'wikipedia draft', slug: 'why-some-wikipedia-drafts-are-accepted-while-others-are-declined', label: 'Wikipedia Draft' }
   ];
 
   let output = text;
@@ -95,25 +100,57 @@ function supportsSpeechSynthesis() {
   return typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 }
 
-async function fetchLikeCount(slug) {
+function getLikeStorageKey(slug) {
+  return `notablepath_like_${slug}`;
+}
+
+function getLocalLikeCount(slug) {
   try {
-    const res = await fetch(`https://api.countapi.xyz/get/notablepath-likes/${encodeURIComponent(slug)}`);
-    if (!res.ok) return 0;
-    const data = await res.json();
-    return Number(data.value || 0);
+    return Number(window.localStorage.getItem(getLikeStorageKey(slug)) || '0');
   } catch (err) {
     return 0;
   }
 }
 
+function setLocalLikeCount(slug, value) {
+  try {
+    window.localStorage.setItem(getLikeStorageKey(slug), String(value));
+  } catch (err) {
+    // Ignore storage failures
+  }
+}
+
+async function fetchLikeCount(slug) {
+  const localCount = getLocalLikeCount(slug);
+  try {
+    const res = await fetch(`https://api.countapi.xyz/get/notablepath-likes/${encodeURIComponent(slug)}`);
+    if (!res.ok) {
+      return localCount;
+    }
+    const data = await res.json();
+    const apiCount = Number(data.value || 0);
+    return Math.max(apiCount, localCount);
+  } catch (err) {
+    return localCount;
+  }
+}
+
 async function hitLike(slug) {
+  const localCount = getLocalLikeCount(slug);
   try {
     const res = await fetch(`https://api.countapi.xyz/hit/notablepath-likes/${encodeURIComponent(slug)}`);
-    if (!res.ok) throw new Error('Hit failed');
+    if (!res.ok) {
+      throw new Error('Hit failed');
+    }
     const data = await res.json();
-    return Number(data.value || 0);
+    const newCount = Number(data.value || 0);
+    const updated = Math.max(newCount, localCount + 1);
+    setLocalLikeCount(slug, updated);
+    return updated;
   } catch (err) {
-    throw err;
+    const fallback = localCount + 1;
+    setLocalLikeCount(slug, fallback);
+    return fallback;
   }
 }
 
