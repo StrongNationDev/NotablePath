@@ -498,7 +498,6 @@ function renderInsightsLanding() {
             <span>${formatDate(article.date)}</span>
             <div class="insight-card-actions">
               <a class="btn btn-secondary" href="${getInsightHref(article.slug)}">Read More</a>
-              <button class="like-btn" data-slug="${article.slug}" aria-pressed="false">👍 <span class="like-count" id="likes-${article.slug}">—</span></button>
             </div>
           </div>
         </div>
@@ -618,37 +617,10 @@ function injectArticleMetadata(article) {
       <span class="article-updated">Last updated ${formatDate(article.updatedDate || article.date)}</span>
     </div>
     ${article.excerpt ? `<p class="article-excerpt">${article.excerpt}</p>` : ''}
-    <div class="article-like" style="margin-top:0.6rem;">
-      <button class="like-btn" id="article-like-btn" data-slug="${article.slug}">👍 <span id="article-like-count">—</span></button>
-    </div>
   `;
   hero.appendChild(details);
 
-  // populate like count for article page
-  (async () => {
-    try {
-      const count = await fetchLikeCount(article.slug);
-      const node = document.getElementById('article-like-count');
-      const btn = document.getElementById('article-like-btn');
-      if (node) node.textContent = String(count);
-      if (btn) {
-        if (count >= 10) btn.disabled = true;
-        btn.addEventListener('click', async (e) => {
-          e.preventDefault();
-          btn.disabled = true;
-          const cur = await fetchLikeCount(article.slug).catch(()=>0);
-          if (cur >= 10) { if(node) node.textContent = String(cur); btn.disabled = true; return; }
-          try {
-            const nc = await hitLike(article.slug);
-            if (node) node.textContent = String(nc);
-            if (nc >= 10) btn.disabled = true; else btn.disabled = false;
-          } catch (err) { btn.disabled = false; }
-        });
-      }
-    } catch (err) {
-      // ignore
-    }
-  })();
+  // No like button on article pages.
 }
 
 function updateMetadata(article) {

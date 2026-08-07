@@ -110,208 +110,174 @@ For teams preparing for the next step, a readiness assessment can make the gap b
     image: '/images/insights/placeholder.svg',
     tags: ['consulting', 'wikipedia ethics', 'research', 'best practices'],
     seoTitle: 'Wikipedia Consultant: What They Do and Why They Matter',
-    seoDescription: 'Understand the role of a Wikipedia consultant, what they can realistically help with, and how to choose one responsibly.',
-    keywords: ['Wikipedia consultant', 'Wikipedia consultation', 'Wikipedia advisor'],
-    ogImage: '/images/insights/placeholder.svg',
     body: `
-# Wikipedia Consultant: What They Do, Why They Matter, and How to Choose One Responsibly
+# Can Anyone Create a Wikipedia Page? Understanding Eligibility, Policies, and Editorial Review
 
-The term Wikipedia consultant is often used loosely, but the role itself can be quite specific. In practice, a consultant is usually someone who helps a person, organization, or editorial team better understand how Wikipedia works and how to prepare material in a way that is more aligned with the platform's standards.
+Anyone can attempt to contribute to Wikipedia, but not every contribution will become a stable, published article. This guide explains the distinction between the ability to create content and the editorial acceptance that determines whether a page remains on the encyclopedia.
 
-## What a Wikipedia consultant actually does
+## Access vs Acceptance
 
-A good consultant does not write the article for the subject or promise outcomes that are outside the platform's rules. Instead, they often help with tasks such as:
+- **Access:** anyone (including anonymous users) can edit many pages on Wikipedia and registered users can create new pages or drafts.
+- **Acceptance:** the community evaluates whether content meets policy and evidentiary requirements; only then will it remain on the live site.
 
-- reviewing available evidence and source quality
-- identifying gaps in a notability case
-- improving the structure of a draft
-- clarifying tone and neutrality
-- preparing a team for editorial review
+## Can anyone edit Wikipedia?
 
-The work is usually less about persuasion and more about preparation.
+Yes. Editing is broadly open. Registered users have additional tools and a persistent identity, but anonymous edits are also possible. All edits are subject to review and reversion by volunteers.
 
-> [!NOTE] The most useful consultants help people work within Wikipedia's standards rather than trying to bypass them.
+What editing involves in practice:
 
-## Why their role can matter
+- adding or improving content
+- correcting grammar or formatting
+- adding or fixing citations
+- removing vandalism or biased language
 
-A consultant can be valuable when the project is still in its early stages and the team needs help understanding what the evidence base looks like. They can also help a client avoid common mistakes, such as relying too heavily on promotional material, using weak sourcing, or misunderstanding the role of neutral writing.
+## Can anyone create a new article?
 
-In many cases, the value comes from clarity. A person or organization may already have strong subject knowledge but still need support in shaping that material into something that is more defensible, better structured, and easier to evaluate.
+Technically, yes. Accounts can create new pages, and drafts can be submitted for review via the Articles for Creation (AfC) process. However, successful publication depends on whether the subject and the draft meet Wikipedia's standards.
 
-## When a consultant is most helpful
+Two common creation workflows:
 
-A consultant is often most useful when a project has one or more of the following issues:
+1. Create directly in the main namespace (live) — faster but more exposed to deletion risk.
+2. Create a draft (or submit via AfC) — safer for new contributors and borderline topics.
 
-1. The source base is incomplete or inconsistent
-2. The team is unclear about whether the topic meets notability expectations
-3. The draft is too promotional or too subjective
-4. The team needs a stronger understanding of reliable sources and editorial expectations
-5. The project is preparing for a readiness assessment
+## Why many drafts are declined
 
-The role is usually best understood as advisory. A consultant can help frame the project more clearly, but they do not replace the need for strong evidence or responsible editorial judgment.
+Drafts are typically declined because of content issues rather than technical problems. Frequent causes include:
 
-## How to choose one responsibly
+- insufficient independent coverage (weak notability)
+- reliance on self-published or promotional sources
+- promotional tone or advocacy writing
+- original research or unsourced claims
+- narrow scope better suited as a subsection of another article
 
-Not every consultant is equally well suited to this kind of work. A responsible choice should be based on how clearly they explain their process, how they treat editorial standards, and whether they focus on evidence, context, and neutrality rather than outcomes that sound too convenient.
+Decision tree: is your draft ready?
 
-| What to look for | Why it matters |
+1. Does the subject have independent coverage? If no, stop and research more.
+2. Are the sources reliable and substantive? If no, replace weak sources.
+3. Is the draft neutral and factual? If no, remove promotional language.
+4. Does the subject fit Wikipedia's scope? If yes to all, submit via draft/AfC.
+
+## What makes someone eligible
+
+Eligibility is about the subject, not the person who creates the page. A subject is eligible when it can be described with verifiable, independent sources and written in an encyclopedic tone.
+
+Eligibility checklist:
+
+- verifiable, independent sources
+- sufficient substantive coverage (not just passing mentions)
+- ability to write neutral prose supported by citations
+- topic fits within Wikipedia's scope (not a how-to, listicle, or promotional page)
+
+## What Wikipedia reviewers evaluate
+
+Reviewers focus on whether the content belongs in an encyclopedia. Core evaluation areas include:
+
+- Neutral Point of View (NPOV)
+- Verifiability (are claims sourced?)
+- No Original Research (are claims supported by published sources?)
+- Notability (is there independent coverage?)
+- Special handling for Biographies of Living Persons (BLP)
+
+Reviewers also inspect source quality and independence; they are not responsible for endorsing or promoting subjects.
+
+## Reliable sources and editorial neutrality
+
+Reliable sources typically have editorial oversight and a reputation for fact-checking: major newspapers, academic journals, books from reputable publishers, government reports, and respected industry publications.
+
+Sources often insufficient on their own: company websites, press releases, personal blogs, and social media posts.
+
+Neutral writing tips:
+
+- Use third-person, factual language
+- Attribute evaluations to sources rather than stating them as facts
+- Avoid promotional adjectives ("leading", "best", "groundbreaking")
+
+| Neutral phrasing | Promotional phrasing |
 | --- | --- |
-| Clear explanation of methodology | Helps you understand whether their approach is realistic and evidence-based |
-| Respect for neutrality and sourcing | Indicates they understand how Wikipedia actually evaluates content |
-| Transparency about limits | Reduces the risk of unrealistic expectations |
-| Experience with editorial context | Improves the likelihood that their guidance is practical |
+| The company was founded in 2018. | The company launched a revolutionary platform in 2018. |
+| Reviews described mixed reception. | Reviews hailed it as the best product of the year. |
 
-## Red flags to avoid
+## Conflict of interest and paid editing
 
-It is important to approach this field with caution. A few warning signs include:
+Conflict of interest (COI) exists when a contributor has a personal or financial relationship with the subject. Wikipedia expects transparency and restraint from contributors with COI.
 
-- promises that sound too certain or too fast
-- advice that ignores the importance of independent coverage
-- pressure to present the subject in a promotional way
-- vague descriptions of how the work will actually be done
+Paid editing is permitted only when contributors disclose their affiliation and avoid adding promotional content. Disclosures should appear on user pages and relevant talk pages.
 
-A responsible consultant should be willing to explain the limits of their role and the realities of the review process.
+Best practices for COI and paid editing:
 
-## The most ethical approach
-
-The best consulting work helps a team improve its preparation without compromising the standards of the encyclopedia. That means focusing on evidence, structure, and fairness rather than trying to shape the narrative around a desired outcome.
-
-If a team is trying to determine whether it is ready for publication or review, a consultant can be useful as part of a broader strategy. But the goal should be to strengthen the project, not to replace the editorial discipline that makes the work credible.
-
-## The takeaway
-
-A Wikipedia consultant can be valuable when they help a team think more clearly about evidence, sourcing, neutrality, and notability. The best ones are not salespeople for a finished outcome. They are careful partners in a process that depends on honesty, discipline, and strong editorial judgment.
-
-For many projects, the most important question is not whether a consultant is helpful. It is whether the consultant helps the team build something that is more evidence-based, more defensible, and more aligned with the standards that matter most.
-    `
-  },
-  {
-    title: 'What Is Wikipedia Notability?',
-    slug: 'what-is-wikipedia-notability',
-    description: 'A comprehensive guide to Wikipedia notability, why it matters for article eligibility, and how it shapes source selection, editorial review, and research strategy.',
-    category: 'Notability',
-    author: 'NotablePath Editorial Team',
-    readingTime: '12 min read',
-    date: '2026-07-12',
-    updatedDate: '2026-07-12',
-    excerpt: 'A definitive guide to Wikipedia notability, its role in editorial standards, and how to evaluate whether a topic is sufficiently significant for encyclopedic coverage.',
-    image: '/images/insights/placeholder.svg',
-    tags: ['notability', 'wikipedia basics', 'article strategy', 'editorial standards'],
-    seoTitle: 'What Is Wikipedia Notability?',
-    seoDescription: 'Understand Wikipedia notability in depth, including its relationship to reliable sources, independent coverage, neutrality, and editorial review.',
-    keywords: ['Wikipedia notability', 'notability standards', 'Wikipedia eligibility', 'reliable sources', 'editorial standards'],
-    ogImage: '/images/insights/placeholder.svg',
-    body: `
-# What Is Wikipedia Notability?
-
-Wikipedia notability is one of the most important concepts in the encyclopedia’s editorial process, but it is also one of the most misunderstood. In simple terms, notability asks whether a topic has enough independent significance to be considered suitable for an encyclopedia entry. It is not simply a question of whether the subject is interesting, prominent, or widely discussed. It is a question of whether the topic has a level of public recognition and relevance that can be demonstrated through credible sources.
-
-That distinction matters because Wikipedia is not a database of every topic that might be important to one person, one company, or one community. It is a reference work that aims to document subjects that have broader significance and can be supported in a way that is transparent and reviewable.
-
-> [!NOTE]
-> Notability is not a measure of popularity. It is a measure of whether a topic has enough independent and relevant recognition to warrant encyclopedic treatment.
-
-## Why notability matters
-
-Notability matters because it helps determine whether a topic belongs in the encyclopedia at all. Before an article can be developed in depth, there must be some basis for believing that the topic is sufficiently significant to merit inclusion. That is why notability is often treated as a threshold concept rather than a stylistic one.
-
-A project can be well written and still fail if the underlying subject lacks the kind of evidence that supports inclusion. For that reason, notability is not only an editorial consideration. It is a planning issue that shapes whether research should continue, whether the scope should be narrowed, or whether a different topic should be chosen.
-
-## What Wikipedia is looking for
-
-Wikipedia generally looks for evidence that a subject has received attention from reliable, independent, and relevant sources. That may include:
-
-- coverage in major or credible news outlets
-- reporting from reputable publications
-- recognition in academic, professional, or trade contexts
-- references in well-established reference works or specialized databases
-- repeated mention in publicly available materials that are not self-generated by the subject
-
-The goal is not to prove that a person or subject is famous in every possible sense. The goal is to show that the topic has enough public-facing significance to be of encyclopedic interest.
-
-### Key Takeaway
-
-Notability is less about being famous and more about being sufficiently recognizable through credible, independent evidence.
-
-## Notability is not the same as publicity
-
-A common mistake is to treat notability as a proxy for marketing reach, social media presence, or personal visibility. That is not what the standard is for. A topic may be highly visible in a narrow circle and still not meet the evidentiary threshold for inclusion.
-
-This is why self-published material, promotional pages, campaign content, and subject-managed biographies are usually not enough on their own. They may indicate that the topic exists and has a public-facing presence, but they do not necessarily demonstrate the kind of independent recognition that supports a robust encyclopedia entry.
-
-In practice, a stronger notability case usually involves evidence from sources that are not primarily controlled by the subject and that can be assessed by others.
-
-## The role of independent coverage
-
-Independent coverage is one of the most important parts of a notability case. When a topic is mentioned in sources that are external to the subject’s own communications, it becomes easier to show that the topic has a broader public footprint.
-
-This is why notability is closely linked to concepts such as [Wikipedia:Notability](https://en.wikipedia.org/wiki/Wikipedia:Notability), [Wikipedia:Reliable sources](https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources), and [Wikipedia:Verifiability](https://en.wikipedia.org/wiki/Wikipedia:Verifiability). A strong notability argument usually depends on the ability to point to evidence that is not only relevant but also independently available and reviewable.
-
-## How notability affects article development
-
-Notability influences several parts of the process:
-
-1. Whether an article is likely to be accepted in the first place
-2. How much source material is needed to support the draft
-3. How much editorial scrutiny the article is likely to receive
-4. Whether the topic needs to be narrowed, reframed, or reconsidered before submission
-
-If a topic has a weak notability case, the solution is usually not to write a more persuasive article. It is to strengthen the evidence, clarify the claims, and reconsider whether the topic is the right one for the project.
+1. Disclose your relationship on the user page and talk page.
+2. Prefer to suggest changes on talk pages rather than directly editing controversial or promotional content.
+3. Rely on independent sources for substantive claims.
 
 ## Common misconceptions
 
-There are several misconceptions that often distort how notability is understood.
+- *Anyone can publish anything:* Open editing does not equal unrestricted publishing; content must meet encyclopedia standards.
+- *If it’s online, it’s a source:* Not all online material is reliable; editorial oversight and independence matter.
+- *Popularity equals notability:* Viral attention alone rarely satisfies the notability requirement.
 
-### Misconception 1: Notability means popularity
+## Why businesses often misunderstand Wikipedia
 
-This is perhaps the most common misunderstanding. A topic can be popular in a small community and still not be notable in the sense that matters for Wikipedia.
+Common business mistakes:
 
-### Misconception 2: A strong website is enough
+- treating Wikipedia as a marketing channel
+- relying on press releases and company blogs as primary evidence
+- drafting with promotional language
 
-A polished website, a well-designed profile, or a self-authored biography may be useful, but it does not automatically establish notability.
+Businesses should document what independent, reputable publications have said about them and allow editors to shape neutral prose.
 
-### Misconception 3: More mentions always mean stronger evidence
+## Notability vs popularity
 
-Not necessarily. A high volume of mentions can still be weak if the mentions are all from the same controlled or promotional context.
+Notability is demonstrated by significant coverage in independent, reliable sources. Popularity is measured by visibility (clicks, followers) and does not substitute for documented independent coverage.
 
-### Misconception 4: Notability is only about being famous
+| Notability | Popularity |
+| --- | --- |
+| Documented by independent sources | Measured by clicks or trends |
+| Supports long-term encyclopedic inclusion | Often temporary or promotional |
 
-Notability is broader than fame. It concerns whether the topic has sufficient public significance and independent recognition to be included in a reference work.
+## Frequently rejected article types
 
-## A practical way to think about it
+- New businesses with only company-produced material
+- Local events with no independent reporting
+- Product descriptions primarily sourced from the maker
+- Biographies of private individuals without significant independent profiles
 
-A useful test is to ask whether a neutral observer could point to strong, independent sources showing that the topic is significant in a public context. If the answer is unclear, the project may need more research before any serious drafting begins.
+These topics can be eligible, but they usually require stronger outside coverage and careful drafting.
 
-A second useful question is whether the evidence supports the specific scope of the article. A topic may be notable in a narrow field but not in the broader way the proposed article suggests. In that case, the article may need to be narrowed or repositioned.
+## FAQs
 
-## Why this matters for submission quality
+**Q: Can I create a page about myself or my company?**
 
-When notability is understood early, the rest of the work becomes easier. The article becomes more focused, the sourcing becomes more credible, and the team is less likely to waste time building a draft around a topic that may never be accepted.
+A: You may, but disclose any conflicts and ensure content is neutral and backed by independent sources.
 
-That is why notability should be treated as a planning issue from the beginning of the process. It is not just a review question. It is a foundation question that affects scope, evidence, and editorial viability.
+**Q: Should I start in draft space?**
 
-## Best practices for evaluating notability
+A: Yes — drafts allow review and revision without immediate exposure to deletion.
 
-When assessing notability, it helps to keep the following habits in mind.
+**Q: Are press releases acceptable sources?**
 
-- Look for evidence that is independent of the subject’s own channels.
-- Ask whether the topic has meaningful recognition beyond a small circle.
-- Evaluate whether the sources are relevant to the claims being made.
-- Consider the broader public context rather than just internal significance.
-- Separate relevance from mere visibility.
+A: Press releases can be used for basic facts, but they are weak for notability and should not be primary evidence.
 
-## Practical takeaways
+## Best practices
 
-Wikipedia notability is about whether a topic has enough independent and verifiable public significance to belong in an encyclopedia. It is a standard that helps protect the encyclopedia from becoming a vehicle for promotion, advocacy, or narrow self-interest.
+1. Gather and document independent, high-quality sources first.
+2. Create a source inventory with citation details.
+3. Draft a concise neutral lead that summarizes coverage.
+4. Submit as a draft for review if notability is borderline.
+5. Disclose any conflicts of interest or paid relationships.
 
-When approached carefully, notability can be a helpful guide rather than a barrier. It helps a team focus on topics that are genuinely worthy of coverage and gives the article a stronger chance of being taken seriously.
+## Key takeaways
 
-## Related Concepts
+- Anyone can attempt to create an article; acceptance depends on evidence and policy compliance.
+- Eligibility is based on the subject and the availability of independent, reliable sources.
+- Neutrality and disclosure are essential, especially for paid editing or COI situations.
 
-- [Reliable Sources](/insights/how-wikipedia-evaluates-reliable-sources/)
-- [Independent Coverage](/insights/understanding-independent-coverage/)
-- [Neutral Writing](/insights/why-neutral-writing-matters/)
+## Related NotablePath Insights
+
+- [What Is Wikipedia Notability?](/insights/what-is-wikipedia-notability/)
+- [How Wikipedia Evaluates Reliable Sources](/insights/how-wikipedia-evaluates-reliable-sources/)
 - [Wikipedia Is Not a Marketing Platform](/insights/wikipedia-is-not-a-marketing-platform/)
+- [Why Neutral Writing Matters](/insights/why-neutral-writing-matters/)
+
     `
   },
   {
@@ -1227,16 +1193,16 @@ The most useful mindset is simple: if the material is there to persuade, treat i
     title: 'How to Create a Wikipedia Page: A Step-by-Step Guide Based on Wikipedia\'s Editorial Standards',
     slug: 'how-to-create-a-wikipedia-page',
     description: 'A comprehensive, policy-aligned guide to creating a Wikipedia page with reliable sourcing, neutral writing, and editorial preparation.',
-    category: 'Guidance',
+    category: 'Best Practices',
     author: 'NotablePath Editorial Team',
-    readingTime: '18 min read',
+    readingTime: '15 min read',
     date: '2026-08-01',
     updatedDate: '2026-08-01',
-    excerpt: 'A comprehensive guide to preparing and creating a Wikipedia page with policy-aligned sources and neutral editorial process.',
+    excerpt: 'A practical, step-by-step guide to building a Wikipedia page with the evidence, structure, and editorial discipline that helps it stand up to review.',
     image: '/images/insights/placeholder.svg',
-    tags: ['wikipedia page creation', 'editorial standards', 'wikipedia guidance', 'notability'],
-    seoTitle: 'How to Create a Wikipedia Page: Step-by-Step Guide',
-    seoDescription: 'Learn how to create a Wikipedia page with an evidence-first process that aligns with Wikipedia policies, editorial review, and neutral writing.',
+    tags: ['wikipedia page creation', 'wikipedia basics', 'article strategy', 'editorial standards'],
+    seoTitle: 'How to Create a Wikipedia Page: A Step-by-Step Guide Based on Wikipedia\'s Editorial Standards',
+    seoDescription: 'A practical, policy-aware guide to creating a Wikipedia page with neutral writing, reliable sourcing, and editorial preparation.',
     keywords: ['How to create a Wikipedia page', 'Wikipedia page creation', 'Wikipedia editorial standards'],
     ogImage: '/images/insights/placeholder.svg',
     body: `
@@ -1711,7 +1677,8 @@ If you are preparing a new Wikipedia page, begin by evaluating the subject's ind
   "mainEntityOfPage": "https://notablepath.com/insights/how-to-create-a-wikipedia-page/"
 }
     `
-  },  {
+  },
+  {
     title: 'Can Anyone Create a Wikipedia Page? Understanding Eligibility, Policies, and Editorial Review',
     slug: 'can-anyone-create-a-wikipedia-page',
     description: 'An evidence-based examination of who can create a Wikipedia page, what eligibility means, and how editorial review determines whether a topic can remain.',
@@ -2138,7 +2105,7 @@ If you are preparing a new Wikipedia page, begin by evaluating the subject's ind
     <p>When preparing a Wikipedia submission, focus on evidence, independence, and editorial quality. The strongest drafts make reviewers' work easier and increase the odds of a stable article.</p>
   </footer>
 </article>
-`
+    `
   },
   {
     title: 'Wikipedia Page for a Business: What Companies Need to Know Before Getting Started',
