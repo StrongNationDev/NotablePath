@@ -2568,7 +2568,7 @@ If this topic is relevant to your organization, a NotablePath Wikipedia Readines
   Editors are collaborators more than adversaries. Approaching the process with humility, strong sourcing, and an openness to feedback makes publication more likely and the resulting article more useful for readers.
 
   If you'd like, NotablePath can help prepare a source inventory, draft a neutral lead, or review a draft before submission.
-    `
+
 1. a user creates or updates content;
 2. the change is reviewed by other editors;
 3. editors may refine, revert, or discuss the change;
