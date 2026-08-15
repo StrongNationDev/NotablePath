@@ -96,6 +96,14 @@ function estimateReadingTime(text) {
   return `${minutes} min read`;
 }
 
+function removeSchemaSection(raw) {
+  if (!raw) return raw;
+  const marker = /(^|\n)##?\s*Article schema\s*/i;
+  const match = raw.match(marker);
+  if (!match) return raw;
+  return raw.slice(0, match.index).trim();
+}
+
 function supportsSpeechSynthesis() {
   return typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 }
@@ -584,7 +592,9 @@ function renderArticlePage() {
   }
   if (heroImageTarget) heroImageTarget.src = article.image;
   if (heroImageTarget) heroImageTarget.alt = article.title;
-  if (contentTarget) contentTarget.innerHTML = renderMarkdownContent(article.body || article.content || '', article);
+  const rawBody = article.body || article.content || '';
+  const cleanedBody = removeSchemaSection(rawBody);
+  if (contentTarget) contentTarget.innerHTML = renderMarkdownContent(cleanedBody, article);
 
   injectArticleMetadata(article);
   updateMetadata(article);
@@ -597,6 +607,26 @@ function renderArticlePage() {
   initCopyLinkButton(article);
   initBackToTop();
   initArticleAudioReader(article);
+
+  // Inject machine-readable JSON-LD into the designated script tag
+  const schemaEl = document.getElementById('articleSchema');
+  if (schemaEl) {
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.title,
+      description: article.seoDescription || article.excerpt || '',
+      author: { '@type': 'Organization', name: article.author || 'NotablePath' },
+      datePublished: article.date || '',
+      dateModified: article.updatedDate || article.date || '',
+      mainEntityOfPage: `https://notablepath.com/insights/${article.slug}/`
+    };
+    try {
+      schemaEl.textContent = JSON.stringify(schema, null, 2);
+    } catch (e) {
+      schemaEl.textContent = '';
+    }
+  }
 }
 
 function injectArticleMetadata(article) {
