@@ -380,61 +380,6 @@ function trackEvent(eventName, eventProps = {}) {
     console.log('[Analytics]', eventName, eventProps);
 }
 
-function initAboutModal() {
-    const aboutModal = document.getElementById('aboutModal');
-    const aboutTrigger = document.querySelector('.nav-about-trigger');
-    const aboutClose = document.querySelector('.about-close');
-    const ABOUT_MODAL_STORAGE_KEY = 'notablepath_about_modal_shown';
-
-    function hasSeenAboutModal() {
-        try {
-            return sessionStorage.getItem(ABOUT_MODAL_STORAGE_KEY) === '1';
-        } catch (error) {
-            return false;
-        }
-    }
-
-    function markAboutModalSeen() {
-        try {
-            sessionStorage.setItem(ABOUT_MODAL_STORAGE_KEY, '1');
-        } catch (error) {
-            console.warn('Unable to persist modal visibility state', error);
-        }
-    }
-
-    function openModal() {
-        if (!aboutModal) return;
-        if (hasSeenAboutModal()) return;
-
-        aboutModal.classList.add('active');
-        aboutModal.setAttribute('aria-hidden', 'false');
-        trackEvent('AboutModalOpened');
-        markAboutModalSeen();
-    }
-
-    function closeModal() {
-        if (!aboutModal) return;
-        aboutModal.classList.remove('active');
-        aboutModal.setAttribute('aria-hidden', 'true');
-        trackEvent('AboutModalClosed');
-    }
-
-    if (aboutTrigger) {
-        aboutTrigger.addEventListener('click', openModal);
-    }
-    if (aboutClose) {
-        aboutClose.addEventListener('click', closeModal);
-    }
-    if (aboutModal) {
-        aboutModal.addEventListener('click', (e) => {
-            if (e.target === aboutModal) {
-                closeModal();
-            }
-        });
-    }
-    setTimeout(openModal, 10000);
-}
-
 function initAnalyticsTracking() {
     document.querySelectorAll('[data-analytics]').forEach(el => {
         el.addEventListener('click', () => {
@@ -514,7 +459,6 @@ function prevQuestion() {
 }
 
 let latestAssessment = null;
-const TELEGRAM_BOT_USERNAME = 'NotablePathBot';
 
 function normalizeArticleStatus(value) {
     return {
@@ -570,19 +514,22 @@ function buildAssessmentSubject(article, coverage, profile) {
 }
 
 async function saveWebsiteAssessment(assessment) {
-    const apiUrl = `${window.location.origin}/api/website-assessment`;
-    const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(assessment)
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Failed to save assessment');
+    const supabaseClient = window.getNotablePathSupabase?.();
+    if (!supabaseClient) {
+        throw new Error('Supabase is not configured');
     }
 
-    return response.json();
+    const { data, error } = await supabaseClient
+        .from('assessments')
+        .insert(assessment)
+        .select()
+        .single();
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
 }
 
 function showAssessmentResult(assessment) {
@@ -590,206 +537,25 @@ function showAssessmentResult(assessment) {
     if (!resultSection) return;
 
     resultSection.querySelector('.result-summary').textContent = `Based on your answers, we calculated a readiness score that helps determine your best next step.`;
-    resultSection.querySelector('.result-score').textContent = `${assessment.score}`;
-    resultSection.querySelector('.result-category').textContent = assessment.readinessCategory;
+    resultSection.querySelector('.result-score').textContent = `${assessment.readiness_score}`;
+    resultSection.querySelector('.result-category').textContent = assessment.readiness_category;
     resultSection.querySelector('.result-detail').textContent = `Article status: ${assessment.articleStatus} · Coverage: ${assessment.coverageLabel} · Profile: ${assessment.profileLabel}`;
     resultSection.hidden = false;
-}
-
-function openConversionModal(assessment = null) {
-    const modal = document.getElementById('conversionModal');
-    if (!modal) return;
-
-    if (assessment) {
-        latestAssessment = assessment;
-    }
-
-    const summary = latestAssessment || {};
-    modal.querySelector('.summary-score').textContent = summary.score ? `${summary.score}` : 'Pending';
-    modal.querySelector('.summary-category').textContent = summary.readinessCategory || 'Assessment not completed';
-    modal.querySelector('.summary-profile').textContent = summary.profileLabel || 'Website Visitor';
-    const conversionStatus = modal.querySelector('.conversion-status');
-    if (conversionStatus) {
-        conversionStatus.textContent = '';
-    }
-    modal.classList.add('active');
-    modal.setAttribute('aria-hidden', 'false');
+    resultSection.classList.add('active');
     document.body.classList.add('modal-open');
-    modal.querySelector('[data-action="open-telegram-assistant"]')?.focus();
 }
 
-function closeConversionModal() {
-    const modal = document.getElementById('conversionModal');
-    if (!modal) return;
-    modal.classList.remove('active');
-    modal.setAttribute('aria-hidden', 'true');
+function closeAssessmentResult() {
+    const resultSection = document.getElementById('assessmentResult');
+    if (!resultSection) return;
+    resultSection.classList.remove('active');
+    resultSection.hidden = true;
     document.body.classList.remove('modal-open');
 }
 
-function openTelegramAssistant() {
-    if (!latestAssessment) {
-        openConversionModal();
-        return;
-    }
-
-    const profileSlug = toSlug(latestAssessment.profileSlug || latestAssessment.profileLabel || 'website');
-    const categorySlug = toSlug(latestAssessment.readinessCategory || 'review');
-    const startParam = `website_${profileSlug}_${categorySlug}`;
-    const url = `https://t.me/${TELEGRAM_BOT_USERNAME}?start=${encodeURIComponent(startParam)}`;
-    window.open(url, '_blank');
-    trackEvent('OpenTelegramAssistant', {
-        score: latestAssessment.score,
-        category: latestAssessment.readinessCategory,
-        profile: latestAssessment.profileLabel
-    });
-}
-
-function openConsultationRequest() {
-    const modal = document.getElementById('consultationModal');
-    if (modal) {
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-open');
-        const firstField = modal.querySelector('input[name="name"]');
-        firstField?.focus();
-        trackEvent('OpenConsultationRequest', {});
-        return;
-    }
-
-    const heroForm = document.getElementById('heroConsultationForm');
-    if (heroForm) {
-        heroForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        heroForm.querySelector('input[name="firstName"]')?.focus();
-    }
-    trackEvent('OpenConsultationRequest', { fallback: 'hero_form' });
-}
-
-function closeConsultationModal() {
-    const modal = document.getElementById('consultationModal');
-    if (!modal) return;
-    modal.classList.remove('active');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('modal-open');
-}
-
-async function submitConsultationRequest(payload) {
-    const endpoints = [
-        'https://formsubmit.co/ajax/hello@notablepath.online',
-        'https://formsubmit.co/ajax/notablepathc@gmail.com'
-    ];
-    const body = new URLSearchParams({
-        _subject: 'NotablePath Consultation Request',
-        _replyto: payload.email || '',
-        _captcha: 'false',
-        _template: 'table',
-        ...payload
-    });
-
-    let lastError = null;
-    for (const endpoint of endpoints) {
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body
-            });
-
-            if (response.ok) {
-                return response.text();
-            }
-
-            const errorText = await response.text();
-            lastError = new Error(`${response.status}: ${errorText}`);
-        } catch (error) {
-            lastError = error;
-        }
-    }
-
-    throw lastError || new Error('Unable to submit consultation request');
-}
-
-async function handleConsultationFormSubmit(event, form, statusElement) {
-    event.preventDefault();
-
-    const formData = new FormData(form);
-    const values = Object.fromEntries(formData.entries());
-    const fullName = [values.firstName, values.lastName].filter(Boolean).join(' ').trim() || values.name || '';
-    const payload = {
-        name: fullName || 'Website Visitor',
-        firstName: values.firstName || '',
-        lastName: values.lastName || '',
-        companyWebsite: values.companyWebsite || '',
-        email: values.email || '',
-        phone: values.phone || '',
-        telegramUsername: values.telegramUsername || '',
-        subject: values.subject || '',
-        preferredDate: values.preferredDate || '',
-        preferredTime: values.preferredTime || '',
-        timezone: values.timezone || '',
-        reason: values.reason || '',
-        source: values.source || form.id,
-        message: [
-            `Name: ${fullName || values.name || 'Website Visitor'}`,
-            `Email: ${values.email || ''}`,
-            `Phone: ${values.phone || ''}`,
-            `Company Website: ${values.companyWebsite || ''}`,
-            `Telegram Username: ${values.telegramUsername || ''}`,
-            `Preferred Date: ${values.preferredDate || ''}`,
-            `Preferred Time: ${values.preferredTime || ''}`,
-            `Timezone: ${values.timezone || ''}`,
-            `Reason: ${values.reason || ''}`
-        ].join('\n')
-    };
-
-    if (!payload.email || !payload.subject || !payload.reason) {
-        if (statusElement) {
-            statusElement.textContent = 'Please complete the required fields so we can follow up.';
-            statusElement.classList.add('error');
-        }
-        return;
-    }
-
-    if (statusElement) {
-        statusElement.textContent = 'Sending your request...';
-        statusElement.classList.remove('error');
-    }
-
-    try {
-        await submitConsultationRequest(payload);
-        if (statusElement) {
-            statusElement.textContent = 'Thank you. We\'ve received your consultation request. Please check your inbox and spam folder for a reply within 30 minutes.';
-        }
-        form.reset();
-        window.alert('Thank you. We\'ve received your consultation request. Please check your inbox and spam folder for a reply within 30 minutes.');
-        closeConsultationModal();
-        trackEvent('ConsultationRequestSubmitted', { source: payload.source });
-    } catch (error) {
-        if (statusElement) {
-            statusElement.textContent = 'We could not send the request automatically. Please email hello@notablepath.online directly.';
-            statusElement.classList.add('error');
-        }
-        trackEvent('ConsultationRequestFailed', { error: error.message });
-    }
-}
-
-function initHeroConsultationForm() {
-    const form = document.getElementById('heroConsultationForm');
-    const statusElement = form?.querySelector('.hero-form-status');
-
-    if (!form) return;
-
-    form.addEventListener('submit', (event) => handleConsultationFormSubmit(event, form, statusElement));
-}
-
-function initConsultationModalForm() {
-    const form = document.getElementById('consultationRequestForm');
-    const statusElement = form?.querySelector('.consultation-form-status');
-
-    if (!form) return;
-
-    form.addEventListener('submit', (event) => handleConsultationFormSubmit(event, form, statusElement));
+function openWorkspaceEntry() {
+    document.getElementById('assessment')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    trackEvent('WorkspaceEntryStarted');
 }
 
 async function submitAssessment() {
@@ -811,8 +577,6 @@ async function submitAssessment() {
     const subject = buildAssessmentSubject(articleStatus, coverageLabel, primaryProfile);
 
     const assessment = {
-        telegram_id: 0,
-        username: null,
         full_name: 'Website Visitor',
         request_type: 'Website Assessment',
         subject,
@@ -844,71 +608,41 @@ async function submitAssessment() {
         readinessCategory
     });
 
-    const modal = document.getElementById('conversionModal');
-    const statusElement = modal ? modal.querySelector('.conversion-status') : null;
-    if (statusElement) {
-        statusElement.textContent = 'Saving your assessment...';
-    }
-
     try {
         await saveWebsiteAssessment(assessment);
-        if (statusElement) {
-            statusElement.textContent = 'Your assessment is recorded and ready for follow-up.';
-        }
         trackEvent('AssessmentSaved', { score, readinessCategory });
     } catch (error) {
-        if (statusElement) {
-            statusElement.textContent = 'There was an issue saving your assessment. You can still continue and our team will follow up manually.';
-        }
         trackEvent('AssessmentSaveFailed', { error: error.message });
     }
 
-    openConversionModal(assessment);
+    trackEvent('AssessmentCompleted', {
+        score,
+        readinessCategory
+    });
 }
 
-function initConversionModal() {
-    const modal = document.getElementById('conversionModal');
-    if (!modal) return;
-
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            closeConversionModal();
-        }
-    });
-
-    modal.querySelector('.conversion-close')?.addEventListener('click', closeConversionModal);
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeConversionModal();
-        }
-    });
-
-    document.querySelectorAll('[data-action="open-conversion-modal"]').forEach(element => {
-        element.addEventListener('click', (event) => {
-            event.preventDefault();
-            openConversionModal(latestAssessment);
-        });
-    });
-
-    document.querySelector('[data-action="open-telegram-assistant"]')?.addEventListener('click', openTelegramAssistant);
-    document.querySelector('[data-action="open-consultation-request"]')?.addEventListener('click', (event) => {
-        event.preventDefault();
-        openConsultationRequest();
-    });
-    document.querySelectorAll('[data-action="close-consultation-modal"]').forEach(element => {
-        element.addEventListener('click', () => closeConsultationModal());
-    });
-    document.getElementById('consultationModal')?.addEventListener('click', (event) => {
-        if (event.target === event.currentTarget) {
-            closeConsultationModal();
-        }
-    });
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeConsultationModal();
-        }
-    });
+function initHeroRotatingText() {
+    const target = document.getElementById('heroRotatingLine');
+    if (!target) return;
+    const phrases = [
+        ['Wikipedia Expertise.', 'hero-line-cyan'],
+        ['Built on Policy.', 'hero-line-violet'],
+        ['Trusted by Professionals.', 'hero-line-green']
+    ];
+    let phraseIndex = 0;
+    let characterIndex = 0;
+    let deleting = false;
+    const tick = () => {
+        const [phrase, className] = phrases[phraseIndex];
+        target.className = `hero-rotating-line ${className}`;
+        characterIndex += deleting ? -1 : 1;
+        target.textContent = phrase.slice(0, characterIndex);
+        let delay = deleting ? 52 : 88;
+        if (!deleting && characterIndex === phrase.length) { deleting = true; delay = 1500; }
+        if (deleting && characterIndex === 0) { deleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; delay = 350; }
+        window.setTimeout(tick, delay);
+    };
+    tick();
 }
 
 /* ============================
@@ -988,36 +722,12 @@ function renderPublishedInsights() {
                                         </div>
                                         <h3 class="published-insight-title">${article.title}</h3>
                                         <p class="published-insight-description">${description}</p>
-                                        <div style="display:flex;gap:0.6rem;align-items:center">
+                                        <div>
                                             <a class="published-insight-link" href="${articleLink}">Read article</a>
-                                            <button class="like-btn" data-slug="${article.slug}" aria-pressed="false">👍 <span class="like-count" id="likes-${article.slug}">—</span></button>
                                         </div>
                                 </div>
                         </article>`;
     }).join('');
-
-        // bind like buttons for featured
-        setTimeout(() => {
-            container.querySelectorAll('.like-btn').forEach(btn => {
-                const slug = btn.dataset.slug;
-                const node = document.getElementById(`likes-${slug}`);
-                // fetch current count
-                fetch(`https://api.countapi.xyz/get/notablepath-likes/${encodeURIComponent(slug)}`).then(r=>r.ok? r.json(): {value:0}).then(d=>{ const c = Number(d.value||0); if(node) node.textContent=String(c); if(c>=10) btn.disabled=true; }).catch(()=>{ if(node) node.textContent='0'; });
-                btn.addEventListener('click', async (e)=>{
-                    e.preventDefault(); btn.disabled=true; try{
-                        const curRes = await fetch(`https://api.countapi.xyz/get/notablepath-likes/${encodeURIComponent(slug)}`);
-                        const cur = curRes.ok ? Number((await curRes.json()).value||0) : 0;
-                        if (cur >= 10) { if(node) node.textContent=String(cur); btn.disabled=true; return; }
-                        const hitRes = await fetch(`https://api.countapi.xyz/hit/notablepath-likes/${encodeURIComponent(slug)}`);
-                        if (!hitRes.ok) throw new Error('hit failed');
-                        const hitData = await hitRes.json();
-                        const nc = Number(hitData.value||0);
-                        if (node) node.textContent = String(nc);
-                        if (nc >= 10) btn.disabled = true; else btn.disabled = false;
-                    } catch (err) { btn.disabled=false; }
-                });
-            });
-        }, 20);
 }
 
 /* ============================
@@ -1184,16 +894,19 @@ document.addEventListener('DOMContentLoaded', () => {
     initFAQ();
     initMagneticButtons();
     initMobileNavbar();
-    initAboutModal();
-    initConversionModal();
-    initHeroConsultationForm();
-    initConsultationModalForm();
     initAnalyticsTracking();
     initTimelineAnimation();
     initScrollIndicator();
     initCardAnimations();
     initWhatsAppButton();
     renderPublishedInsights();
+    initHeroRotatingText();
+    document.getElementById('assessmentResultClose')?.addEventListener('click', closeAssessmentResult);
+    document.getElementById('assessmentResult')?.addEventListener('click', event => {
+        if (event.target.id === 'assessmentResult') closeAssessmentResult();
+    });
+
+    document.querySelector('[data-action="start-workspace"]')?.addEventListener('click', openWorkspaceEntry);
     
     const pageName = document.body.dataset.page || (window.location.pathname.includes('services') ? 'services' : 'homepage');
     trackEvent('PageView', { page: pageName });

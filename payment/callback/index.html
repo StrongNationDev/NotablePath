@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Payment status | NotablePath</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; background: #f4f7fb; color: #172033; }
+    body { display: grid; min-height: 100vh; place-items: center; margin: 0; padding: 24px; }
+    main { width: min(100%, 520px); padding: 32px; background: white; border: 1px solid #dce3ee; border-radius: 12px; box-shadow: 0 18px 45px rgba(23, 32, 51, .1); }
+    h1 { margin-top: 0; font-size: 1.7rem; }
+    p { line-height: 1.6; }
+    code { overflow-wrap: anywhere; }
+    a { display: inline-block; margin-top: 12px; padding: 12px 16px; border-radius: 8px; background: #1d4ed8; color: white; text-decoration: none; }
+    .reference { color: #52627a; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Payment return received</h1>
+    <p id="status">Checking payment status...</p>
+    <p class="reference" id="reference"></p>
+    <a href="../../workspace.html">Return to workspace</a>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get('reference') || params.get('trxref');
+    if (reference) document.getElementById('reference').textContent = `Reference: ${reference}`;
+    const status = document.getElementById('status');
+    if (reference) {
+      const webhookUrls = [
+        'https://etmpljusmehfomzeqkvs.supabase.co/functions/v1/paystack-webhook',
+        'https://etmpljusmehfomzeqkvs.supabase.co/functions/v1/payment-webhook'
+      ];
+      const verifyPayment = async () => {
+        let lastError = null;
+        for (const webhookUrl of webhookUrls) {
+          try {
+            const response = await fetch(`${webhookUrl}?reference=${encodeURIComponent(reference)}`);
+            const body = await response.json();
+            if (response.ok && body.ok) return body;
+            lastError = new Error(body.error || `Verification failed (${response.status}).`);
+          } catch (error) {
+            lastError = error;
+          }
+        }
+        throw lastError || new Error('Payment verification is unavailable.');
+      };
+      verifyPayment()
+        .then(body => {
+          status.textContent = body.status === 'successful'
+            ? 'Payment verified successfully. Return to the workspace to see the updated offer.'
+            : 'Payment is still being confirmed. Return to the workspace shortly.';
+        })
+        .catch(error => { status.textContent = error.message || 'Payment verification is pending. Please return to the workspace shortly.'; });
+    } else {
+      status.textContent = 'No payment reference was provided.';
+    }
+  </script>
+</body>
+</html>

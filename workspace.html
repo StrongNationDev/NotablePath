@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Client Workspace | NotablePath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/workspace.css">
+</head>
+<body class="workspace-page">
+  <header class="workspace-header">
+    <a class="workspace-brand" href="index.html">NotablePath</a>
+    <div class="workspace-user"><span id="workspace-client-name">Client Workspace</span><button id="workspace-theme" class="icon-button" type="button" aria-label="Switch to light mode" title="Switch theme">Light mode</button><button id="workspace-logout" class="text-button" type="button" hidden>Sign out</button></div>
+  </header>
+  <main class="workspace-shell">
+    <section id="workspace-access" class="access-panel" aria-live="polite">
+      <p class="workspace-kicker">PRIVATE CLIENT WORKSPACE</p>
+      <h1>Continue the conversation with NotablePath.</h1>
+       <p id="workspace-access-message">Use your email and password to enter your private workspace.</p>
+      <form id="magic-link-form" class="access-form" novalidate>
+        <label for="client-email">Email address</label>
+        <input id="client-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+        <label for="client-password">Password</label>
+        <input id="client-password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+        <div class="auth-actions"><button class="workspace-button primary" type="submit" name="auth-action" value="signin">Sign in</button><button class="workspace-button secondary" type="submit" name="auth-action" value="signup">Create account</button></div>
+      </form>
+      <p class="access-help">Already used a magic link? Sign in with the password you created, or <button id="client-magic-link" class="text-button" type="button">email me a secure link</button>.</p>
+      <p id="workspace-form-status" class="inline-status" role="status"></p>
+    </section>
+
+    <section id="workspace-app" class="workspace-layout" hidden>
+      <section class="conversation-panel" aria-labelledby="conversation-title">
+        <div class="conversation-heading"><div><p class="workspace-kicker">DIRECT CONVERSATION</p><h1 id="conversation-title">Your NotablePath team</h1></div><span class="status-chip">Asynchronous support</span></div>
+        <div id="message-list" class="message-list" aria-live="polite"></div>
+        <form id="message-form" class="composer"><label class="sr-only" for="message-body">Message</label><textarea id="message-body" rows="3" maxlength="5000" placeholder="Write a message to NotablePath..."></textarea><div class="composer-actions"><input id="client-file-input" type="file" hidden accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"><button class="icon-button attach-button" id="client-attach-button" type="button" aria-label="Attach file" title="Attach file"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.4 11.6-8.8 8.8a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/></svg></button><button class="workspace-button primary send-button" type="submit" aria-label="Send message" title="Send message"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 11.5 21 3l-4.5 18-5.25-6.25L3 11.5Zm0 0 8.25 3.25L21 3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/></svg></button></div></form>
+        <p id="workspace-app-status" class="inline-status" role="status"></p>
+        <div id="client-offers" class="offer-list" aria-live="polite"></div>
+        <form id="client-offer-form" class="offer-form"><p class="workspace-kicker">REQUEST AN OFFER</p><label for="client-offer-amount">Amount in NGN</label><input id="client-offer-amount" type="number" min="1" step="1" required><input type="hidden" id="client-offer-currency" value="NGN"><button class="workspace-button secondary" type="submit">Request offer</button><p id="client-offer-status" class="inline-status" role="status"></p></form>
+        <p class="workspace-note">An agent will reply within one hour during business hours.</p>
+      </section>
+      <aside class="context-sidebar" aria-label="Workspace context">
+        <div><p class="workspace-kicker">CLIENT</p><h2 id="context-client-name">Your profile</h2><p id="context-client-email"></p></div>
+        <div class="context-block"><span>Assessment</span><strong id="context-assessment">Loading...</strong></div>
+        <div class="context-block"><span>Project status</span><strong id="context-project">Conversation open</strong></div>
+        <div class="context-block"><span>Files</span><strong>Available in conversation</strong></div>
+        <div class="context-block"><span>Offers & payments</span><strong id="client-offer-context">Live in conversation</strong></div>
+      </aside>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/workspace.js"></script>
+</body>
+</html>
