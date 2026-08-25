@@ -85,30 +85,25 @@
   };
 
   async function loadAdminOffers(conversationId) {
-    const form = document.getElementById('admin-offer-form');
-    if (!form) return;
-    let summary = document.getElementById('admin-offer-summary');
-    if (!summary) {
-      summary = document.createElement('div');
-      summary.id = 'admin-offer-summary';
-      summary.className = 'offer-list';
-      form.before(summary);
-    }
-    const offers = await client.from('offers').select('id, title, amount, currency, status, expires_at, accepted_at').eq('conversation_id', conversationId).order('created_at', { ascending: false });
+    const list = document.getElementById('admin-message-list');
+    if (!list) return;
+    const offers = await client.from('offers').select('id, title, description, amount, currency, status, expires_at, accepted_at').eq('conversation_id', conversationId).order('created_at', { ascending: false });
     if (offers.error) return;
     const payments = offers.data.length ? await client.from('payments').select('offer_id, status, paid_at').in('offer_id', offers.data.map(offer => offer.id)) : { data: [] };
-    summary.replaceChildren();
+    list.querySelectorAll('.admin-chat-offer').forEach(item => item.remove());
     offers.data.forEach(offer => {
       const payment = (payments.data || []).find(item => item.offer_id === offer.id);
-      const row = document.createElement('div');
-      row.className = 'offer-card';
-      const details = document.createElement('span');
-      details.textContent = `${offer.title || 'Offer'} · ${Number(offer.amount).toLocaleString()} ${offer.currency || 'NGN'}`;
+      const row = document.createElement('article');
+      row.className = 'admin-chat-offer';
+      const title = document.createElement('strong');
+      title.textContent = offer.title || 'Offer';
+      const details = document.createElement('p');
+      details.textContent = `${Number(offer.amount).toLocaleString()} ${offer.currency || 'NGN'}${offer.description ? ` · ${offer.description}` : ''}`;
       const state = document.createElement('span');
       state.className = 'status-chip';
       state.textContent = payment?.status === 'successful' ? 'Payment Successful' : (payment?.status || offer.status || 'pending');
-      row.append(details, state);
-      summary.appendChild(row);
+      row.append(title, details, state);
+      list.appendChild(row);
     });
   }
 
@@ -125,12 +120,12 @@
     list.appendChild(Object.assign(document.createElement('p'), { textContent: 'Loading messages...' }));
     form.hidden = false;
     document.getElementById('admin-offer-form').hidden = false;
-    await loadAdminOffers(conversation.id);
     const result = await client.from('messages').select('id, body, sender_id, created_at, message_type').eq('conversation_id', conversation.id).order('created_at', { ascending: true });
     if (result.error) throw result.error;
     list.replaceChildren();
     if (!result.data.length) list.appendChild(Object.assign(document.createElement('p'), { textContent: 'No messages yet.' }));
     result.data.forEach(item => list.appendChild(renderMessage(item, currentUserId)));
+    await loadAdminOffers(conversation.id);
     messageChannel = client.channel(`admin-messages-${conversation.id}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversation.id}` }, payload => {
       if (!list.querySelector(`[data-message-id="${payload.new.id}"]`)) list.appendChild(renderMessage(payload.new, currentUserId));
       list.lastElementChild?.scrollIntoView({ block: 'nearest' });

@@ -85,8 +85,7 @@
 
   const renderOffers = offers => {
     const offerList = document.getElementById('client-offers');
-    if (!offerList) return;
-    offerList.replaceChildren();
+    if (offerList) offerList.replaceChildren();
     const chatOffers = document.getElementById('client-offer-messages');
     if (chatOffers) chatOffers.replaceChildren();
     offers.forEach(offer => {

@@ -33,9 +33,10 @@ button { cursor: pointer; }
 a { color: inherit; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-.workspace-header { min-height: 76px; padding: 1rem clamp(1rem, 4vw, 4rem); display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: rgba(10, 15, 28, .88); border-bottom: 1px solid var(--workspace-line); color: #fff; backdrop-filter: blur(16px); }
+.workspace-header { position: sticky; top: 0; z-index: 1000; min-height: 76px; padding: 1rem clamp(1rem, 4vw, 4rem); display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: rgba(10, 15, 28, .88); border-bottom: 1px solid var(--workspace-line); color: #fff; backdrop-filter: blur(16px); }
 :root[data-theme="light"] .workspace-header { background: rgba(35, 54, 75, .96); }
-.workspace-brand { font: 700 1.35rem 'Space Grotesk', sans-serif; text-decoration: none; letter-spacing: .01em; }
+.workspace-brand { display: inline-flex; align-items: center; gap: .55rem; font: 700 1.35rem 'Space Grotesk', sans-serif; text-decoration: none; letter-spacing: .01em; }
+.workspace-logo { width: 2rem; height: 2rem; object-fit: contain; }
 .workspace-user { display: flex; align-items: center; gap: .85rem; color: #d6deea; font-size: .88rem; }
 .text-button, .icon-button { border: 0; color: inherit; background: transparent; }
 .text-button { padding: .4rem 0; text-decoration: underline; text-underline-offset: .2em; }
@@ -66,6 +67,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .access-help { margin: 1rem 0 0; font-size: .82rem; }
 
 .workspace-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1.5rem; align-items: start; }
+.workspace-page:not(.admin-page) .client-offer-panel { grid-column: 2; grid-row: 1; margin: 0; position: sticky; top: 5.5rem; }
+.workspace-page:not(.admin-page) .context-sidebar { grid-column: 2; grid-row: 2; }
+.workspace-page:not(.admin-page) .conversation-panel { grid-column: 1; grid-row: 1 / span 2; }
 .conversation-panel, .admin-inbox, .context-sidebar { overflow: hidden; }
 .conversation-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.5rem; border-bottom: 1px solid var(--workspace-line); }
 .status-chip { display: inline-flex; align-items: center; border: 1px solid var(--workspace-line); border-radius: 999px; padding: .35rem .65rem; color: var(--workspace-muted); font-size: .75rem; white-space: nowrap; }
@@ -100,8 +104,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .context-block span { color: var(--workspace-muted); font-size: .78rem; }
 .context-block strong { font-size: .92rem; }
 
-.admin-layout { display: grid; grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr); gap: 1.5rem; align-items: start; }
-.admin-conversation { min-width: 0; }
+.admin-layout { display: grid; grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr) minmax(260px, .65fr); gap: 1.5rem; align-items: start; }
+.admin-conversation { display: contents; }
+.admin-conversation > .conversation-heading { grid-column: 2; grid-row: 1; background: var(--workspace-surface); border: 1px solid var(--workspace-line); border-radius: var(--workspace-radius) var(--workspace-radius) 0 0; }
+.admin-conversation > .message-list { grid-column: 2; grid-row: 2; min-width: 0; background: var(--workspace-surface); border-left: 1px solid var(--workspace-line); border-right: 1px solid var(--workspace-line); }
+.admin-conversation > .composer { grid-column: 2; grid-row: 3; background: var(--workspace-surface); border: 1px solid var(--workspace-line); border-top: 0; border-radius: 0 0 var(--workspace-radius) var(--workspace-radius); }
+.admin-conversation > .offer-form { grid-column: 3; grid-row: 1 / span 3; align-self: start; margin: 0; position: sticky; top: 1rem; }
+.admin-chat-offer { margin: .5rem auto; width: min(92%, 560px); padding: .85rem 1rem; border: 1px solid rgba(0, 212, 255, .35); border-radius: 12px; background: linear-gradient(135deg, rgba(0, 212, 255, .12), var(--workspace-surface-raised)); }
+.admin-chat-offer strong { display: block; color: var(--workspace-accent); }
+.admin-chat-offer p { margin: .2rem 0 .65rem; color: var(--workspace-muted); font-size: .86rem; }
+.admin-chat-offer .status-chip { margin: 0; }
 .admin-list { display: grid; }
 .admin-list-item { width: 100%; display: grid; gap: .25rem; padding: 1rem 1.5rem; border: 0; border-bottom: 1px solid var(--workspace-line); color: var(--workspace-muted); background: transparent; text-align: left; font-size: .82rem; }
 .admin-list-item:hover, .admin-list-item:focus-visible { background: var(--workspace-surface-raised); }
@@ -110,6 +122,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 @media (max-width: 800px) {
   .workspace-layout, .admin-layout { grid-template-columns: 1fr; }
+  .workspace-page:not(.admin-page) .conversation-panel, .workspace-page:not(.admin-page) .client-offer-panel, .workspace-page:not(.admin-page) .context-sidebar { grid-column: 1; grid-row: auto; position: static; }
+  .admin-conversation { display: block; }
+  .admin-conversation > .conversation-heading, .admin-conversation > .message-list, .admin-conversation > .composer, .admin-conversation > .offer-form { margin-left: 0; margin-right: 0; border-radius: var(--workspace-radius); }
   .context-sidebar { order: 2; }
   .message-list { min-height: 46vh; max-height: none; }
 }
