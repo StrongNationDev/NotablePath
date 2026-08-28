@@ -14,6 +14,9 @@
   let sendingOffer = false;
 
   const allowedRedirects = new Set([
+    'http://localhost:8000/workspace/',
+    'http://localhost:9000/workspace/',
+    'https://notablepath.online/workspace/',
     'http://localhost:8000/workspace.html',
     'http://localhost:9000/workspace.html',
     'https://notablepath.online/workspace.html'
@@ -21,8 +24,9 @@
 
   const workspaceRedirect = () => {
     const current = `${window.location.origin}${window.location.pathname}`;
-    return allowedRedirects.has(current) || (window.location.hostname === 'localhost' && window.location.pathname === '/workspace.html')
-      ? current : 'https://notablepath.online/workspace.html';
+    const isLocalWorkspacePath = window.location.hostname === 'localhost' && (window.location.pathname === '/workspace/' || window.location.pathname === '/workspace.html');
+    return allowedRedirects.has(current) || isLocalWorkspacePath
+      ? current : 'https://notablepath.online/workspace/';
   };
 
   const sanitizePrefill = (value, maxLength) => String(value || '').replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, maxLength);
@@ -305,7 +309,7 @@
   }
 
   async function sendClientMagicLink(email) {
-    window.setNotablePathAuthDestination?.('/workspace.html');
+    window.setNotablePathAuthDestination?.('/workspace/');
     const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: workspaceRedirect() } });
     if (error) throw error;
     setStatus('Please check your email for a secure sign-in link.');

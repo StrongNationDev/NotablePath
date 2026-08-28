@@ -52,10 +52,12 @@
   const adminRedirect = () => {
     const current = `${window.location.origin}${window.location.pathname}`;
     return new Set([
+      'http://localhost:9000/admin/',
+      'https://notablepath.online/admin/',
       'http://localhost:9000/admin.html',
       'https://notablepath.online/admin.html'
-    ]).has(current) || (window.location.hostname === 'localhost' && window.location.pathname === '/admin.html')
-      ? current : 'https://notablepath.online/admin.html';
+    ]).has(current) || (window.location.hostname === 'localhost' && (window.location.pathname === '/admin/' || window.location.pathname === '/admin.html'))
+      ? current : 'https://notablepath.online/admin/';
   };
 
   const getRoleValue = data => {
@@ -268,7 +270,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setStatus('Enter your staff email address first.'); return; }
     event.currentTarget.disabled = true;
     try {
-      window.setNotablePathAuthDestination?.('/admin.html');
+      window.setNotablePathAuthDestination?.('/admin/');
       const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: adminRedirect() } });
       if (error) throw error;
       setStatus('Please check your email for the secure sign-in link.');

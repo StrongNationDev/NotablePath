@@ -30,9 +30,9 @@ window.getNotablePathSupabase = function getNotablePathSupabase() {
 };
 
 window.setNotablePathAuthDestination = function setNotablePathAuthDestination(path) {
-    const allowedPath = path === '/admin.html' || path === '/workspace.html' ? path : null;
-    if (!allowedPath) return;
-    window.localStorage.setItem('notablepath-auth-destination', `${window.location.origin}${allowedPath}`);
+    const normalized = path === '/admin/' || path === '/admin.html' || path === '/workspace/' || path === '/workspace.html' ? path : null;
+    if (!normalized) return;
+    window.localStorage.setItem('notablepath-auth-destination', `${window.location.origin}${normalized}`);
 };
 
 (() => {
@@ -45,7 +45,7 @@ window.setNotablePathAuthDestination = function setNotablePathAuthDestination(pa
     try {
         const parsedDestination = destination ? new URL(destination) : null;
         if (parsedDestination && parsedDestination.origin === window.location.origin &&
-            (parsedDestination.pathname === '/admin.html' || parsedDestination.pathname === '/workspace.html')) {
+            (parsedDestination.pathname === '/admin/' || parsedDestination.pathname === '/admin.html' || parsedDestination.pathname === '/workspace/' || parsedDestination.pathname === '/workspace.html')) {
             allowedDestination = parsedDestination.href;
         }
     } catch (error) {
