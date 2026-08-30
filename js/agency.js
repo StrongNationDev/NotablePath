@@ -1,5 +1,6 @@
 (function () {
   const FALLBACK_CATEGORY = 'PR & Communications';
+  const FALLBACK_COMPANY = 'Your Organization';
 
   function escapeHtml(value) {
     return String(value)
@@ -8,6 +9,31 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  function sanitizeText(value, fallback = FALLBACK_COMPANY) {
+    const raw = value == null ? '' : String(value).trim();
+    if (!raw) return fallback;
+
+    let cleaned = raw;
+    try {
+      cleaned = decodeURIComponent(cleaned);
+    } catch (error) {
+      cleaned = raw;
+    }
+
+    cleaned = cleaned
+      .replace(/[\u0000-\u001F\u007F]/g, ' ')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!cleaned) return fallback;
+    if (cleaned.length > 200) {
+      cleaned = cleaned.substring(0, 200).trim();
+    }
+
+    return cleaned;
   }
 
   function sanitizeCategory(value) {
@@ -64,6 +90,12 @@
     return label;
   }
 
+  function getCompanyName() {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get('company');
+    return sanitizeText(raw, FALLBACK_COMPANY);
+  }
+
   function updateDate() {
     const el = document.getElementById('researchDate');
     if (!el) return;
@@ -74,6 +106,14 @@
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  function injectCompanyName() {
+    const companyName = getCompanyName();
+    const companyNode = document.getElementById('companyNameDisplay');
+    if (!companyNode) return;
+
+    companyNode.textContent = `Prepared for: ${escapeHtml(companyName)}`;
   }
 
   function injectCategory() {
@@ -119,6 +159,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     updateDate();
+    injectCompanyName();
     injectCategory();
   });
 })();
