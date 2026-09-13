@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#0A0F1C" />
+    <title>Verify Payment | NotablePath</title>
+    <meta name="description" content="Manual payment verification and account details for a NotablePath assessment." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./payment.css" />
+  </head>
+  <body class="payment-page">
+    <header class="payment-header">
+      <div class="container header-inner">
+        <a class="brand" href="https://notablepath.online/" aria-label="NotablePath home">
+          <img src="../images/logo.svg" alt="NotablePath" class="brand-logo" />
+        </a>
+        <a class="header-link" href="https://notablepath.online/">Back to NotablePath</a>
+      </div>
+    </header>
+
+    <main class="container payment-shell">
+      <section class="payment-hero">
+        <p class="eyebrow">Payment instructions</p>
+        <h1>Complete your assessment payment</h1>
+        <p id="lead-summary" class="lead-summary">Your assessment is ready for payment verification.</p>
+      </section>
+
+      <section class="payment-methods" aria-labelledby="payment-method-title">
+        <div class="payment-method-header">
+          <div>
+            <p class="eyebrow">Choose one payment method</p>
+            <h2 id="payment-method-title">Select how you would like to pay</h2>
+          </div>
+          <label class="method-select-label" for="payment-method">Payment method</label>
+          <select id="payment-method" class="method-select">
+            <option value="us-bank">US bank transfer</option>
+            <option value="uk-bank">UK GBP bank transfer</option>
+            <option value="bep20">USDT via BEP20</option>
+            <option value="trc20">USDT via TRC20</option>
+          </select>
+        </div>
+
+        <div class="payment-options">
+        <article class="payment-card payment-option" data-payment-option="us-bank">
+          <div class="card-header">
+            <span class="card-badge">US Bank</span>
+            <strong>Bank transfer</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Account holder</span>
+            <strong>Precious Adeboye Morakinyo</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Account number</span>
+            <strong>212682277994</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Bank name</span>
+            <strong>Lead</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Bank address</span>
+            <strong>1801 Main St., Kansas City, MO 64108</strong>
+          </div>
+        </article>
+
+        <article class="payment-card payment-option" data-payment-option="uk-bank" hidden>
+          <div class="card-header">
+            <span class="card-badge">UK GBP Bank</span>
+            <strong>Bank transfer</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Account holder</span>
+            <strong>Precious Adeboye Morakinyo</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Account number</span>
+            <strong>66270680</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Sort code</span>
+            <strong>041307</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Swift code</span>
+            <strong>CLJUGB21XXX</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Bank name</span>
+            <strong>Clear Junction Limited</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>IBAN</span>
+            <strong>GB87CLJU04130766270680</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Bank address</span>
+            <strong>4th Floor Imperial House, 15 Kingsway, London, United Kingdom, WC2B 6UN</strong>
+          </div>
+        </article>
+        <article class="wallet-card payment-option" data-payment-option="bep20" hidden>
+          <div class="wallet-header">
+            <span class="card-badge">USDT via transfer</span>
+            <strong>BEP20</strong>
+          </div>
+
+          <p class="wallet-copy-text">Make a transfer to your wallet address below.</p>
+
+          <div class="qr-wrapper">
+            <img class="qr-image" src="./images/BEP20.jpg" alt="BEP20 wallet QR code" />
+          </div>
+
+          <div class="address-row">
+            <code id="bep20-address">0x4bC5277Fab55680b38224B0beD512A12911D3A12</code>
+            <button type="button" class="mini-button copy-button" data-copy="0x4bC5277Fab55680b38224B0beD512A12911D3A12">Copy</button>
+          </div>
+        </article>
+
+        <article class="wallet-card payment-option" data-payment-option="trc20" hidden>
+          <div class="wallet-header">
+            <span class="card-badge">USDT via transfer</span>
+            <strong>TRC20</strong>
+          </div>
+
+          <p class="wallet-copy-text">Make a transfer to your wallet address below.</p>
+
+          <div class="qr-wrapper">
+            <img class="qr-image" src="./images/TRC20.jpg" alt="TRC20 wallet QR code" />
+          </div>
+
+          <div class="address-row">
+            <code id="trc20-address">TX9ZfjGxWAzL58qkjevbDxKsQSGfagyce8</code>
+            <button type="button" class="mini-button copy-button" data-copy="TX9ZfjGxWAzL58qkjevbDxKsQSGfagyce8">Copy</button>
+          </div>
+        </article>
+        </div>
+      </section>
+
+      <section class="cta-panel">
+        <div class="cta-copy">
+          <p class="eyebrow">Verification</p>
+          <h2>Once you have sent payment, verify it below.</h2>
+          <p>
+            After you send any payment, use the confirmation button below. A verification check will run in the browser and then guide you to the workspace for final manual confirmation.
+          </p>
+        </div>
+
+        <div class="cta-actions">
+          <button id="verify-button" class="action-button primary" type="button">Verify Me to Inbox</button>
+          <!-- <a class="action-button secondary" href="https://notablepath.online/workspace" target="_blank" rel="noopener noreferrer">Go to Workspace</a> -->
+        </div>
+      </section>
+    </main>
+
+    <div id="verification-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal="true"></div>
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-header">
+          <h3 id="modal-title">Payment status</h3>
+          <button type="button" class="close-button" aria-label="Close modal" data-close-modal="true">×</button>
+        </div>
+
+        <div class="progress-wrap" aria-live="polite">
+          <div class="progress-label">
+            <span>Verification in progress</span>
+            <strong id="progress-label">1%</strong>
+          </div>
+          <div class="progress-bar" aria-hidden="true">
+            <span id="progress-fill"></span>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <p id="modal-message">Checking the transfer details.</p>
+        </div>
+
+        <div class="modal-actions">
+          <a id="workspace-link" class="action-button primary" href="https://notablepath.online/workspace" target="_blank" rel="noopener noreferrer">Open Workspace</a>
+          <button type="button" class="action-button secondary" data-close-modal="true">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./payment.js"></script>
+  </body>
+</html>
