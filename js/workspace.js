@@ -31,6 +31,21 @@
 
   const sanitizePrefill = (value, maxLength) => String(value || '').replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, maxLength);
 
+  async function resolveAgentEmailForConversation(conversationIdValue) {
+    const fallback = 'notablepathc@gmail.com';
+    if (!conversationIdValue) return fallback;
+    try {
+      const { data, error } = await client.from('conversations').select('assigned_agent_id').eq('id', conversationIdValue).maybeSingle();
+      if (error || !data?.assigned_agent_id) return fallback;
+      const { data: profileData, error: profileError } = await client.from('profiles').select('email').eq('id', data.assigned_agent_id).maybeSingle();
+      if (profileError || !profileData?.email) return fallback;
+      return profileData.email;
+    } catch (error) {
+      console.warn('Unable to resolve agent email for conversation', error);
+      return fallback;
+    }
+  }
+
   const setStatus = (message, error = false) => {
     status.textContent = message;
     status.dataset.state = error ? 'error' : 'success';
@@ -197,6 +212,14 @@
     const payments = await client.from('payments').select('offer_id, status').in('offer_id', offers.data.map(offer => offer.id));
     const paymentByOffer = new Map((payments.data || []).map(payment => [payment.offer_id, payment.status]));
     renderOffers(offers.data.map(offer => ({ ...offer, payment_status: paymentByOffer.get(offer.id) })));
+  }
+
+  function notifyViaEmail({ recipientEmail, subject, body, conversationId }) {
+    const targetEmail = recipientEmail || 'notablepathc@gmail.com';
+    const chatLink = `https://notablepath.online/workspace/?email=${encodeURIComponent(targetEmail)}`;
+    const emailBody = `${body}\n\nOpen the chat: ${chatLink}`;
+    const mailtoLink = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+    window.location.href = mailtoLink;
   }
 
   async function loadConversation(user) {
@@ -385,6 +408,13 @@
         const list = document.getElementById('message-list');
         if (insertedMessage && !list.querySelector(`[data-message-id="${insertedMessage.id}"]`)) list.appendChild(renderMessage(insertedMessage, userData.user.id));
         list.lastElementChild?.scrollIntoView({ block: 'nearest' });
+        const agentEmail = await resolveAgentEmailForConversation(conversationId);
+        notifyViaEmail({
+          recipientEmail: agentEmail,
+          subject: 'New client message in NotablePath workspace',
+          body: `A client sent a new message in the NotablePath workspace.\n\nMessage: ${body || 'Attachment sent'}\n\nConversation ID: ${conversationId}`,
+          conversationId
+        });
         setStatus('Message sent.');
       }
     } catch (error) {

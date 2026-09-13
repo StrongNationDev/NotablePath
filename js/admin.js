@@ -109,8 +109,32 @@
     });
   }
 
+  function notifyViaEmail({ recipientEmail, subject, body, conversationId }) {
+    const targetEmail = recipientEmail || 'notablepathc@gmail.com';
+    const chatLink = `https://notablepath.online/workspace/?email=${encodeURIComponent(targetEmail)}`;
+    const emailBody = `${body}\n\nOpen the chat: ${chatLink}`;
+    const mailtoLink = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+    window.location.href = mailtoLink;
+  }
+
+  async function resolveClientEmailForConversation(conversationIdValue) {
+    const fallback = 'notablepathc@gmail.com';
+    if (!conversationIdValue) return fallback;
+    try {
+      const { data, error } = await client.from('conversations').select('client_id').eq('id', conversationIdValue).maybeSingle();
+      if (error || !data?.client_id) return fallback;
+      const { data: clientData, error: clientError } = await client.from('clients').select('primary_email').eq('id', data.client_id).maybeSingle();
+      if (clientError || !clientData?.primary_email) return fallback;
+      return clientData.primary_email;
+    } catch (error) {
+      console.warn('Unable to resolve client email for conversation', error);
+      return fallback;
+    }
+  }
+
   async function openConversation(conversation, currentUserId) {
     selectedConversationId = conversation.id;
+    window.__notablepathSelectedClientEmail = conversation.client_email || null;
     if (messageChannel) await client.removeChannel(messageChannel);
     const title = document.getElementById('admin-conversation-title');
     const statusChip = document.getElementById('admin-conversation-status');
@@ -124,6 +148,10 @@
     document.getElementById('admin-offer-form').hidden = false;
     const result = await client.from('messages').select('id, body, sender_id, created_at, message_type').eq('conversation_id', conversation.id).order('created_at', { ascending: true });
     if (result.error) throw result.error;
+    const clientResult = await client.from('clients').select('primary_email').eq('id', conversation.client_id).maybeSingle();
+    if (!clientResult.error && clientResult.data?.primary_email) {
+      window.__notablepathSelectedClientEmail = clientResult.data.primary_email;
+    }
     list.replaceChildren();
     if (!result.data.length) list.appendChild(Object.assign(document.createElement('p'), { textContent: 'No messages yet.' }));
     result.data.forEach(item => list.appendChild(renderMessage(item, currentUserId)));
@@ -298,7 +326,7 @@
         messageBody = await uploadAttachment(file, userData.user.id);
         messageType = 'file';
       }
-      const result = await client.from('messages').insert({ conversation_id: selectedConversationId, sender_id: userData.user.id, body: messageBody, message_type: messageType }).select('id, body, sender_id, created_at, message_type').single();
+        const result = await client.from('messages').insert({ conversation_id: selectedConversationId, sender_id: userData.user.id, body: messageBody, message_type: messageType }).select('id, body, sender_id, created_at, message_type').single();
       if (result.error) reportError(result.error, 'Unable to send this reply.');
       else {
         document.getElementById('admin-message-body').value = '';
@@ -306,6 +334,13 @@
         const list = document.getElementById('admin-message-list');
         if (!list.querySelector(`[data-message-id="${result.data.id}"]`)) list.appendChild(renderMessage(result.data, userData.user.id));
         list.lastElementChild?.scrollIntoView({ block: 'nearest' });
+        const clientEmail = window.__notablepathSelectedClientEmail || await resolveClientEmailForConversation(selectedConversationId) || 'notablepathc@gmail.com';
+        notifyViaEmail({
+          recipientEmail: clientEmail,
+          subject: 'New message from NotablePath',
+          body: `A NotablePath agent sent you a new message.\n\nMessage: ${body || 'Attachment sent'}\n\nReply here or open the workspace chat inside your email.`,
+          conversationId: selectedConversationId
+        });
         document.getElementById('admin-message-status').textContent = 'Reply sent.';
       }
     }
