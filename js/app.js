@@ -682,15 +682,17 @@ function initWhatsAppButton() {
 function initFAQ() {
     document.querySelectorAll('.faq-question').forEach(button => {
         button.addEventListener('click', (e) => {
-            const faqItem = button.parentElement;
+            const faqItem = button.closest('.faq-item');
             const isActive = faqItem.classList.contains('active');
             
             document.querySelectorAll('.faq-item').forEach(item => {
                 item.classList.remove('active');
+                item.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
             });
             
             if (!isActive) {
                 faqItem.classList.add('active');
+                button.setAttribute('aria-expanded', 'true');
             }
         });
     });
@@ -768,26 +770,39 @@ function initMobileNavbar() {
         navbarToggle.addEventListener('click', () => {
             const isOpen = navbarMenu.classList.toggle('mobile-open');
             navbarToggle.classList.toggle('open', isOpen);
-            navbarMenu.style.display = isOpen ? 'flex' : 'none';
+            navbarToggle.setAttribute('aria-expanded', String(isOpen));
+            navbarToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+            navbarMenu.style.removeProperty('display');
             if (navbarInner) {
                 navbarInner.classList.toggle('open', isOpen);
             }
         });
     }
 
-    document.querySelectorAll('.navbar-menu a, .nav-about-trigger').forEach(link => {
+    document.querySelectorAll('.navbar-menu a, .navbar-menu button, .nav-about-trigger').forEach(link => {
         link.addEventListener('click', () => {
             if (navbarMenu) {
                 navbarMenu.classList.remove('mobile-open');
-                navbarMenu.style.display = 'none';
+                navbarMenu.style.removeProperty('display');
             }
             if (navbarToggle) {
                 navbarToggle.classList.remove('open');
+                navbarToggle.setAttribute('aria-expanded', 'false');
+                navbarToggle.setAttribute('aria-label', 'Open navigation');
             }
             if (navbarInner) {
                 navbarInner.classList.remove('open');
             }
         });
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && navbarMenu?.classList.contains('mobile-open')) {
+            navbarMenu.classList.remove('mobile-open');
+            navbarToggle?.setAttribute('aria-expanded', 'false');
+            navbarToggle?.setAttribute('aria-label', 'Open navigation');
+            navbarToggle?.focus();
+        }
     });
 }
 

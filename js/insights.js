@@ -619,7 +619,7 @@ function renderArticlePage() {
       author: { '@type': 'Organization', name: article.author || 'NotablePath' },
       datePublished: article.date || '',
       dateModified: article.updatedDate || article.date || '',
-      mainEntityOfPage: `https://notablepath.com/insights/${article.slug}/`
+      mainEntityOfPage: `https://notablepath.online/insights/${article.slug}/`
     };
     try {
       schemaEl.textContent = JSON.stringify(schema, null, 2);
@@ -665,7 +665,7 @@ function updateMetadata(article) {
   const twitterImage = document.querySelector('meta[name="twitter:image"]');
 
   if (metaDescription) metaDescription.setAttribute('content', article.seoDescription);
-  if (canonical) canonical.setAttribute('href', `https://notablepath.com/insights/${article.slug}/`);
+  if (canonical) canonical.setAttribute('href', `https://notablepath.online/insights/${article.slug}/`);
   if (ogTitle) ogTitle.setAttribute('content', article.seoTitle);
   if (ogDescription) ogDescription.setAttribute('content', article.seoDescription);
   if (ogImage) ogImage.setAttribute('content', article.ogImage);
@@ -686,14 +686,14 @@ function updateMetadata(article) {
       author: {
         '@type': 'Organization',
         name: article.author,
-        url: 'https://notablepath.com'
+        url: 'https://notablepath.online'
       },
       publisher: {
         '@type': 'Organization',
         name: 'NotablePath',
-        url: 'https://notablepath.com'
+        url: 'https://notablepath.online'
       },
-      mainEntityOfPage: `https://notablepath.com/insights/${article.slug}/`,
+      mainEntityOfPage: `https://notablepath.online/insights/${article.slug}/`,
       keywords: article.keywords.join(', ')
     };
     schemaTarget.textContent = JSON.stringify(schema);
@@ -709,19 +709,19 @@ function updateMetadata(article) {
           '@type': 'ListItem',
           position: 1,
           name: 'Home',
-          item: 'https://notablepath.com/'
+          item: 'https://notablepath.online/'
         },
         {
           '@type': 'ListItem',
           position: 2,
           name: 'Insights',
-          item: 'https://notablepath.com/insights/'
+          item: 'https://notablepath.online/insights/'
         },
         {
           '@type': 'ListItem',
           position: 3,
           name: article.title,
-          item: `https://notablepath.com/insights/${article.slug}/`
+          item: `https://notablepath.online/insights/${article.slug}/`
         }
       ]
     };
@@ -847,7 +847,7 @@ async function updateViewCount(slug, target) {
 
 function initShareButtons(article) {
   const shareButtons = document.querySelectorAll('[data-share]');
-  const shareUrl = `https://notablepath.com/insights/${article.slug}/`;
+  const shareUrl = `https://notablepath.online/insights/${article.slug}/`;
 
   shareButtons.forEach(button => {
     button.addEventListener('click', async () => {
@@ -878,7 +878,7 @@ function initCopyLinkButton(article) {
   button.innerHTML = '⧉';
   button.title = 'Copy link';
   button.addEventListener('click', async () => {
-    const shareUrl = `https://notablepath.com/insights/${article.slug}/`;
+    const shareUrl = `https://notablepath.online/insights/${article.slug}/`;
     if (navigator.clipboard) {
       await navigator.clipboard.writeText(shareUrl);
       button.innerHTML = '✓';

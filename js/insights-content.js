@@ -1674,7 +1674,7 @@ If you are preparing a new Wikipedia page, begin by evaluating the subject's ind
   "author": { "@type": "Organization", "name": "NotablePath" },
   "datePublished": "2026-08-01",
   "dateModified": "2026-08-01",
-  "mainEntityOfPage": "https://notablepath.com/insights/how-to-create-a-wikipedia-page/"
+  "mainEntityOfPage": "https://notablepath.online/insights/how-to-create-a-wikipedia-page/"
 }
     `
   },
@@ -2406,7 +2406,7 @@ If this topic is relevant to your organization, a NotablePath Wikipedia Readines
   "author": { "@type": "Organization", "name": "NotablePath" },
   "datePublished": "2026-08-03",
   "dateModified": "2026-08-03",
-  "mainEntityOfPage": "https://notablepath.com/insights/wikipedia-page-for-business/"
+  "mainEntityOfPage": "https://notablepath.online/insights/wikipedia-page-for-business/"
 }
     `
   },
@@ -2660,7 +2660,7 @@ If you are preparing a Wikipedia article, think of editors as collaborators in q
   "author": { "@type": "Organization", "name": "NotablePath" },
   "datePublished": "2026-08-04",
   "dateModified": "2026-08-04",
-  "mainEntityOfPage": "https://notablepath.com/insights/wikipedia-editors-explained/"
+  "mainEntityOfPage": "https://notablepath.online/insights/wikipedia-editors-explained/"
 }
     `
   },
@@ -2783,7 +2783,7 @@ Before submitting a draft, review it against Wikipedia's key policies and be rea
   "author": { "@type": "Organization", "name": "NotablePath" },
   "datePublished": "2026-08-05",
   "dateModified": "2026-08-05",
-  "mainEntityOfPage": "https://notablepath.com/insights/why-some-wikipedia-drafts-are-accepted-while-others-are-declined/"
+  "mainEntityOfPage": "https://notablepath.online/insights/why-some-wikipedia-drafts-are-accepted-while-others-are-declined/"
 }
     `
   }
