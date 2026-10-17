@@ -84,6 +84,7 @@
 
     const submitButton = form.querySelector('[type="submit"]');
     const payload = Object.fromEntries(new FormData(form).entries());
+    payload._replyto = payload['Email address'];
     payload._subject = `NotablePath project enquiry: ${payload.Topic}`;
     submitButton.disabled = true;
     submitting = true;
