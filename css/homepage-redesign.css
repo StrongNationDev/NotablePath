@@ -37,7 +37,7 @@ body[data-page="home"] .content-width { width: min(var(--page-width), calc(100% 
 body[data-page="home"] .skip-link { position: fixed; z-index: 3000; top: 10px; left: 10px; padding: .7rem 1rem; transform: translateY(-150%); border-radius: 3px; background: var(--color-primary); color: #fff; }
 body[data-page="home"] .skip-link:focus { transform: translateY(0); }
 
-body[data-page="home"] .site-header { position: relative; z-index: 30; height: 82px; border-bottom: 1px solid var(--color-border); background: rgba(255, 255, 255, .96); }
+body[data-page="home"] .site-header { position: sticky; top: 0; z-index: 1000; height: 82px; border-bottom: 1px solid var(--color-border); background: rgba(255, 255, 255, .92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 body[data-page="home"] .navbar { position: static; width: 100%; padding: 0; }
 body[data-page="home"] .navbar-inner { display: flex; width: min(var(--page-width), calc(100% - 48px)); min-height: 82px; margin-inline: auto; padding: 0; align-items: center; justify-content: space-between; border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
 body[data-page="home"] .navbar-inner::before,
@@ -184,7 +184,8 @@ body[data-page="home"] .guide-item p { margin: 0 0 1rem; color: var(--color-mute
 body[data-page="home"] .guide-item .text-link { margin-top: auto; }
 body[data-page="home"] .all-guides-link { display: inline-flex; margin-top: 1.4rem; gap: .5rem; font-size: .86rem; font-weight: 700; }
 
-body[data-page="home"] .closing-cta { padding: 4.2rem 0; background: var(--color-primary); color: #fff; }
+body[data-page="home"] .closing-cta { position: relative; padding: 4.2rem 0; background: var(--color-primary); color: #fff; }
+body[data-page="home"] .anchor-alias { position: absolute; inset-block-start: 0; }
 body[data-page="home"] .closing-layout { display: flex; align-items: center; justify-content: space-between; gap: 3rem; }
 body[data-page="home"] .closing-layout > div:first-child { max-width: 690px; }
 body[data-page="home"] .closing-layout .eyebrow { color: #B9D2FA; }

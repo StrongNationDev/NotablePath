@@ -766,8 +766,19 @@ function initMobileNavbar() {
     const navbarMenu = document.querySelector('.navbar-menu');
     const navbarInner = document.querySelector('.navbar-inner');
 
-    if (navbarToggle && navbarMenu) {
-        navbarToggle.addEventListener('click', () => {
+    if (navbarToggle && navbarMenu && !navbarToggle.hasAttribute('data-public-managed')) {
+        const toggleIsButton = navbarToggle instanceof HTMLButtonElement;
+        if (!toggleIsButton) {
+            navbarToggle.setAttribute('role', 'button');
+            navbarToggle.setAttribute('tabindex', '0');
+        }
+        navbarToggle.setAttribute('aria-expanded', String(navbarMenu.classList.contains('mobile-open')));
+        navbarToggle.setAttribute('aria-label', navbarMenu.classList.contains('mobile-open') ? 'Close navigation' : 'Open navigation');
+        if (navbarMenu.id) {
+            navbarToggle.setAttribute('aria-controls', navbarMenu.id);
+        }
+
+        const toggleMenu = () => {
             const isOpen = navbarMenu.classList.toggle('mobile-open');
             navbarToggle.classList.toggle('open', isOpen);
             navbarToggle.setAttribute('aria-expanded', String(isOpen));
@@ -776,7 +787,17 @@ function initMobileNavbar() {
             if (navbarInner) {
                 navbarInner.classList.toggle('open', isOpen);
             }
-        });
+        };
+
+        navbarToggle.addEventListener('click', toggleMenu);
+        if (!toggleIsButton) {
+            navbarToggle.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleMenu();
+                }
+            });
+        }
     }
 
     document.querySelectorAll('.navbar-menu a, .navbar-menu button, .nav-about-trigger').forEach(link => {

@@ -16,6 +16,11 @@
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://notablepath.online/insights/update-existing-wikipedia-biography/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
     <loc>https://notablepath.online/insights/why-most-wikipedia-articles-fail-before-they-are-even-submitted/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.82</priority>
